@@ -1,6 +1,6 @@
 # BetterCombat Extension
 
-This is an extension to the 'Better Combat' mod. It adds support for stamina provided by the mod 'Stamina Attributes' and some additional config options.
+This is an extension to the [Better Combat](https://modrinth.com/mod/better-combat) mod by Daedelus. It adds support for stamina provided by the mod [Stamina Attributes](https://modrinth.com/mod/stamina-attributes) and some additional config options.
 
 ## Server config
 

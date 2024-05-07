@@ -112,7 +112,8 @@ modrinth {
 	dependencies = [
 			new ModDependency('P7dR8mSH', 'required'), // Fabric API
 			new ModDependency('9s6osm5g', 'required'), // Cloth Config
-			new ModDependency('5sy6g3kz', 'required') // Better Combat
+			new ModDependency('5sy6g3kz', 'required'), // Better Combat
+			new ModDependency('QKOE26gD', 'required') // Stamina Attributes
 	]
 	changelog = "${update_changelog}"
 }

@@ -33,6 +33,7 @@
 		"java": ">=17",
 		"fabric-api": "*",
 		"cloth-config": ">=11.1.106",
-		"bettercombat": ">=1.8.4+1.20.1-fabric"
+		"bettercombat": ">=1.8.4+1.20.1-fabric",
+		"staminaattributes": ">=1.0.0"
 	}
 }
