@@ -4,7 +4,7 @@ import com.github.theredbrain.bettercombatextension.config.ServerConfig;
 import com.github.theredbrain.bettercombatextension.config.ServerConfigWrapper;
 import com.github.theredbrain.bettercombatextension.network.packet.AttackStaminaCostPacket;
 import com.github.theredbrain.bettercombatextension.network.packet.AttackStaminaCostPacketReceiver;
-import com.github.theredbrain.staminaattributes.StaminaAttributes;
+import com.github.theredbrain.staminaattributes.entity.StaminaUsingEntity;
 import com.google.gson.Gson;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
@@ -13,6 +13,8 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.RegistryKeys;
@@ -26,6 +28,22 @@ public class BetterCombatExtension implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ServerConfig serverConfig;
 	private static PacketByteBuf serverConfigSerialized = PacketByteBufs.create();
+
+	public static final boolean isStaminaAttributesLoaded = FabricLoader.getInstance().isModLoaded("staminaattributes");
+
+	public static float getCurrentStamina(LivingEntity livingEntity) {
+		float currentStamina = 0.0F;
+		if (isStaminaAttributesLoaded) {
+			currentStamina = ((StaminaUsingEntity) livingEntity).staminaattributes$getStamina();
+		}
+		return currentStamina;
+	}
+
+	public static void addStamina(LivingEntity livingEntity, float amount) {
+		if (isStaminaAttributesLoaded) {
+			((StaminaUsingEntity) livingEntity).staminaattributes$addStamina(amount);
+		}
+	}
 
 	@Override
 	public void onInitialize() {
@@ -41,13 +59,13 @@ public class BetterCombatExtension implements ModInitializer {
 		// Events
 		serverConfigSerialized = ServerConfigSync.write(serverConfig);
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			sender.sendPacket(StaminaAttributes.ServerConfigSync.ID, serverConfigSerialized);
+			sender.sendPacket(ServerConfigSync.ID, serverConfigSerialized);
 		});
 
 	}
 
 	public static class ServerConfigSync { // TODO 1.20.6 port to packet
-		public static Identifier ID = identifier("bettercombatextension_server_config_sync");
+		public static Identifier ID = identifier("server_config_sync");
 
 		public static PacketByteBuf write(ServerConfig serverConfig) {
 			var gson = new Gson();

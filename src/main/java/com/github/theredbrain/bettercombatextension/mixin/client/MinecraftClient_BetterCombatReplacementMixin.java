@@ -3,8 +3,8 @@ package com.github.theredbrain.bettercombatextension.mixin.client;
 import com.github.theredbrain.bettercombatextension.BetterCombatExtension;
 import com.github.theredbrain.bettercombatextension.bettercombat.DuckWeaponAttributesAttackMixin;
 import com.github.theredbrain.bettercombatextension.client.DuckMinecraftClientMixin;
+import com.github.theredbrain.bettercombatextension.config.ServerConfig;
 import com.github.theredbrain.bettercombatextension.network.packet.AttackStaminaCostPacket;
-import com.github.theredbrain.staminaattributes.entity.StaminaUsingEntity;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.bettercombat.BetterCombat;
@@ -44,7 +44,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -290,7 +289,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
             if (hand != null) {
                 float upswingRate = (float)hand.upswingRate();
                 if (this.upswingTicks <= 0 && this.attackCooldown <= 0 && !this.player.isUsingItem() && !((double)this.player.getAttackCooldownProgress(0.0F) < 1.0 - (double)upswingRate)) {
-                    if (((DuckWeaponAttributesAttackMixin) (Object) hand.attack()).bettercombatextension$getStaminaCost() > 0 && ((StaminaUsingEntity)this.player).staminaattributes$getStamina() <= 0 && !this.player.isCreative()) {
+                    if (BetterCombatExtension.isStaminaAttributesLoaded && ((DuckWeaponAttributesAttackMixin) (Object) hand.attack()).bettercombatextension$getStaminaCost() > 0.0F && BetterCombatExtension.getCurrentStamina(this.player) * BetterCombatExtension.serverConfig.global_attack_stamina_cost_multiplier <= 0.0F && !this.player.isCreative()) {
                         this.player.sendMessage(Text.translatable("hud.message.staminaTooLow"), true);
                         return;
                     }
@@ -309,7 +308,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
                     AnimatedHand animatedHand = AnimatedHand.from(isOffHand, attributes.isTwoHanded());
                     ((PlayerAttackAnimatable)this.player).playAttackAnimation(animationName, animatedHand, attackCooldownTicksFloat, upswingRate);
                     ClientPlayNetworking.send(Packets.AttackAnimation.ID, (new Packets.AttackAnimation(this.player.getId(), animatedHand, animationName, attackCooldownTicksFloat, upswingRate)).write());
-                    ClientPlayNetworking.send(new AttackStaminaCostPacket(((DuckWeaponAttributesAttackMixin) (Object) hand.attack()).bettercombatextension$getStaminaCost()));
+//                    ClientPlayNetworking.send(new AttackStaminaCostPacket(((DuckWeaponAttributesAttackMixin) (Object) hand.attack()).bettercombatextension$getStaminaCost()));
                     BetterCombatClientEvents.ATTACK_START.invoke((handler) -> {
                         handler.onPlayerAttackStart(this.player, hand);
                     });
@@ -415,13 +414,25 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 
     @Unique
     private void performAttack() {
+        ServerConfig serverConfig = BetterCombatExtension.serverConfig;
         if (BetterCombatKeybindings.feintKeyBinding.isPressed()) {
             this.player.resetLastAttackedTicks();
             this.cancelWeaponSwing();
+            // feinting an attack increases combo count
+            if (serverConfig.feinting_increases_combo_count) {
+                this.setComboCount(this.getComboCount() + 1);
+                AttackHand hand = this.getCurrentHand();
+                if (hand != null && BetterCombatExtension.isStaminaAttributesLoaded) {
+                    ClientPlayNetworking.send(new AttackStaminaCostPacket(((DuckWeaponAttributesAttackMixin) (Object) hand.attack()).bettercombatextension$getStaminaCost() * serverConfig.global_feint_stamina_cost_multiplier));
+                }
+            }
         } else {
             AttackHand hand = this.getCurrentHand();
             if (hand != null) {
                 WeaponAttributes.Attack attack = hand.attack();
+                if (BetterCombatExtension.isStaminaAttributesLoaded) {
+                    ClientPlayNetworking.send(new AttackStaminaCostPacket(((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$getStaminaCost() * serverConfig.global_attack_stamina_cost_multiplier));
+                }
                 double upswingRate = hand.upswingRate();
                 if (!((double)this.player.getAttackCooldownProgress(0.0F) < 1.0 - upswingRate)) {
                     Entity cursorTarget = this.getCursorTarget();

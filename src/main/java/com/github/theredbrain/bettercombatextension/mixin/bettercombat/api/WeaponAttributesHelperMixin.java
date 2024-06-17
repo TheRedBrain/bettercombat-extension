@@ -38,7 +38,7 @@ public class WeaponAttributesHelperMixin {
                 } else {
                     base = new WeaponAttributes.Attack((WeaponAttributes.Condition[])null, (WeaponAttributes.HitBoxShape)null, 0.0, 0.0, 0.0, (String)null, (WeaponAttributes.Sound)null, (WeaponAttributes.Sound)null);
                     ((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$setDamageType("");
-                    ((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$setStaminaCost(0);
+                    ((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$setStaminaCost(0.0F);
                 }
                 WeaponAttributes.Attack override = b.attacks()[i];
                 WeaponAttributes.Attack attack = new WeaponAttributes.Attack(override.conditions() != null ? override.conditions() : base.conditions(), override.hitbox() != null ? override.hitbox() : base.hitbox(), override.damageMultiplier() != 0.0 ? override.damageMultiplier() : base.damageMultiplier(), override.angle() != 0.0 ? override.angle() : base.angle(), override.upswing() != 0.0 ? override.upswing() : base.upswing(), override.animation() != null ? override.animation() : base.animation(), override.swingSound() != null ? override.swingSound() : base.swingSound(), override.impactSound() != null ? override.impactSound() : base.impactSound());
@@ -48,8 +48,8 @@ public class WeaponAttributesHelperMixin {
                     ((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setDamageType(override_damageType);
                 }
 
-                int override_staminaCost = ((DuckWeaponAttributesAttackMixin) (Object) override).bettercombatextension$getStaminaCost();
-                if (override_staminaCost != 0) {
+                float override_staminaCost = ((DuckWeaponAttributesAttackMixin) (Object) override).bettercombatextension$getStaminaCost();
+                if (override_staminaCost != 0.0F) {
                     ((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setStaminaCost(override_staminaCost);
                 }
 

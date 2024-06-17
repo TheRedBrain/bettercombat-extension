@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class PlayerAttackHelperMixin {
 
     @Inject(method = "isDualWielding", at = @At("RETURN"), cancellable = true)
-    private static void bam$isDualWielding(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
+    private static void bettercombatextension$isDualWielding(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(cir.getReturnValue() && !(!player.getMainHandStack().isIn(BetterCombatExtension.EMPTY_HAND_WEAPONS) && player.getOffHandStack().isIn(BetterCombatExtension.EMPTY_HAND_WEAPONS)));
         cir.cancel();
     }

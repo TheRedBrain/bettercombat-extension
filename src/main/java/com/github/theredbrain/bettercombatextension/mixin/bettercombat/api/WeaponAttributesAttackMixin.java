@@ -9,17 +9,17 @@ import org.spongepowered.asm.mixin.Unique;
 public class WeaponAttributesAttackMixin implements DuckWeaponAttributesAttackMixin {
 
     @Unique
-    private int stamina_cost = 0;
+    private float stamina_cost = 0.0F;
     @Unique
     private String damage_type = "";
 
     @Override
-    public int bettercombatextension$getStaminaCost() {
+    public float bettercombatextension$getStaminaCost() {
         return this.stamina_cost;
     }
 
     @Override
-    public void bettercombatextension$setStaminaCost(int staminaCost) {
+    public void bettercombatextension$setStaminaCost(float staminaCost) {
         this.stamina_cost = staminaCost;
     }
 

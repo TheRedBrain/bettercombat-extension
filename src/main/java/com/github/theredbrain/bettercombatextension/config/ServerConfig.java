@@ -29,6 +29,18 @@ public class ServerConfig implements ConfigData {
             continuously attacking while holding down the attack key.
             """)
     public boolean disable_better_combat_hold_to_attack = false;
+    @Comment("""
+            When set to true, feinting an attack skips it.
+            """)
+    public boolean feinting_increases_combo_count = false;
+    @Comment("""
+            The stamina cost of all attacks is multiplied with this value when the attack is feinted.
+            """)
+    public float global_feint_stamina_cost_multiplier = 1.0F;
+    @Comment("""
+            The stamina cost of all attacks is multiplied with this value when the attack is executed.
+            """)
+    public float global_attack_stamina_cost_multiplier = 1.0F;
     public ServerConfig() {
 
     }

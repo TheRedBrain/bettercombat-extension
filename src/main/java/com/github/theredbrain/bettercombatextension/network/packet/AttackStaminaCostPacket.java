@@ -11,14 +11,14 @@ public class AttackStaminaCostPacket implements FabricPacket {
             AttackStaminaCostPacket::new
     );
 
-    public final int staminaCost;
+    public final float staminaCost;
 
-    public AttackStaminaCostPacket(int staminaCost) {
+    public AttackStaminaCostPacket(float staminaCost) {
         this.staminaCost = staminaCost;
     }
 
     public AttackStaminaCostPacket(PacketByteBuf buf) {
-        this(buf.readInt());
+        this(buf.readFloat());
     }
     @Override
     public PacketType<?> getType() {
@@ -26,6 +26,6 @@ public class AttackStaminaCostPacket implements FabricPacket {
     }
     @Override
     public void write(PacketByteBuf buf) {
-        buf.writeInt(this.staminaCost);
+        buf.writeFloat(this.staminaCost);
     }
 }
