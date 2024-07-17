@@ -12,6 +12,7 @@
 	},
 
 	"license": "MIT",
+	"icon": "assets/bettercombatextension/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
