@@ -93,15 +93,18 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
             WeaponAttributes mainHandAttributes = WeaponRegistry.getAttributes(mainHandStack);
             WeaponAttributes offHandAttributes = WeaponRegistry.getAttributes(player.getOffHandStack());
 
-            boolean isTwoHandedWielding = (mainHandAttributes != null && mainHandAttributes.isTwoHanded()) || (offHandStack.isEmpty() && BetterCombatExtension.serverConfig.empty_offhand_equals_two_handing_mainhand);
+            boolean isWeaponTwoHanded = mainHandAttributes != null && mainHandAttributes.isTwoHanded();
+            boolean isAlternativeTwoHandedWieldingActive = mainHandAttributes != null && !mainHandAttributes.isTwoHanded() && offHandStack.isEmpty() && BetterCombatExtension.serverConfig.empty_offhand_equals_two_handing_mainhand;
 
-            if (isTwoHandedWielding) {
-                if (mainHandAttributes != null) {
-                    String two_handed_pose = ((DuckWeaponAttributesMixin) (Object) mainHandAttributes).bettercombatextension$getTwoHandedPose();
-                    if (two_handed_pose != null) {
-                        newMainHandPose = (KeyframeAnimation) AnimationRegistry.animations.get(two_handed_pose);
-                    }
+            if (isWeaponTwoHanded) {
+                if (mainHandAttributes.pose() != null) {
+                    newMainHandPose = (KeyframeAnimation)AnimationRegistry.animations.get(mainHandAttributes.pose());
                 }
+            } else if (isAlternativeTwoHandedWieldingActive) {
+				String two_handed_pose = ((DuckWeaponAttributesMixin) (Object) mainHandAttributes).bettercombatextension$getTwoHandedPose();
+				if (two_handed_pose != null) {
+					newMainHandPose = (KeyframeAnimation) AnimationRegistry.animations.get(two_handed_pose);
+				}
             } else {
                 if (mainHandAttributes != null && mainHandAttributes.pose() != null) {
                     newMainHandPose = (KeyframeAnimation)AnimationRegistry.animations.get(mainHandAttributes.pose());
