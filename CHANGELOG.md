@@ -1,3 +1,7 @@
+# 1.2.0
+
+Attack stamina cost calculation has been changed. Each attack now has a "attack_stamina_cost_multiplier" instead of a "attack_stamina_cost" float field. It defaults to 1.0. There is also a new entity attribute called "generic.attack_stamina_cost" which defaults to 1.0. The actual stamina cost is the product of these two values and the "global_attack_stamina_cost_multiplier" defined in the server config. This change allows the attack stamina cost to be changed in game.
+
 # 1.1.1
 
 - poses of two-handed weapons are now correctly displayed

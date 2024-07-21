@@ -1,21 +1,23 @@
 {
-  "required": true,
-  "package": "com.github.theredbrain.bettercombatextension.mixin",
-  "compatibilityLevel": "JAVA_17",
-  "mixins": [
-    "bettercombat.PlayerAttackHelperMixin",
-    "bettercombat.api.WeaponAttributesAttackMixin",
-    "bettercombat.api.WeaponAttributesHelperMixin",
-    "bettercombat.api.WeaponAttributesMixin",
-    "entity.damage.DamageSourcesMixin"
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  },
-  "client": [
-    "client.MinecraftClient_BetterCombatReplacementMixin",
-    "client.MouseMixin",
-    "client.network.AbstractClientPlayerEntity_BetterCombatReplacementMixin",
-    "client.network.ClientPlayerEntityMixin_BetterCombatReplacementMixin"
-  ]
+	"required": true,
+	"package": "com.github.theredbrain.bettercombatextension.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"mixins": [
+		"bettercombat.PlayerAttackHelperMixin",
+		"bettercombat.api.WeaponAttributesAttackMixin",
+		"bettercombat.api.WeaponAttributesHelperMixin",
+		"bettercombat.api.WeaponAttributesMixin",
+		"entity.LivingEntityMixin",
+		"entity.attribute.EntityAttributesMixin",
+		"entity.damage.DamageSourcesMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"client": [
+		"client.MinecraftClient_BetterCombatReplacementMixin",
+		"client.MouseMixin",
+		"client.network.AbstractClientPlayerEntity_BetterCombatReplacementMixin",
+		"client.network.ClientPlayerEntityMixin_BetterCombatReplacementMixin"
+	]
 }

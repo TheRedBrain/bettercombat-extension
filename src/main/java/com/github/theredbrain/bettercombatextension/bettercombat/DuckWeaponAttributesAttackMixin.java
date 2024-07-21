@@ -1,9 +1,9 @@
 package com.github.theredbrain.bettercombatextension.bettercombat;
 
 public interface DuckWeaponAttributesAttackMixin {
-    float bettercombatextension$getStaminaCost();
+    float bettercombatextension$getStaminaCostMultiplier();
 
-    void bettercombatextension$setStaminaCost(float staminaCost);
+    void bettercombatextension$setStaminaCostMultiplier(float staminaCostMultiplier);
 
     String bettercombatextension$getDamageType();
 
