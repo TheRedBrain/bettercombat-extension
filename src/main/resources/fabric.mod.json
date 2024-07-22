@@ -10,7 +10,6 @@
 	"contact": {
 		"sources": "https://github.com/TheRedBrain/bettercombat-extension"
 	},
-
 	"license": "MIT",
 	"icon": "assets/bettercombatextension/icon.png",
 	"environment": "*",

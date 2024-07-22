@@ -22,20 +22,20 @@ import java.util.Optional;
 @Mixin(DamageSources.class)
 public abstract class DamageSourcesMixin {
 
-    @Inject(method = "playerAttack", at = @At("RETURN"), cancellable = true)
-    public void bettercombatextension$playerAttack(PlayerEntity attacker, CallbackInfoReturnable<DamageSource> cir) {
-        AttackHand attackHand = ((EntityPlayer_BetterCombat) attacker).getCurrentAttack();
-        if (attackHand != null) {
-            String damageTypeString = ((DuckWeaponAttributesAttackMixin) (Object) attackHand.attack()).bettercombatextension$getDamageType();
-            if (damageTypeString != null && !damageTypeString.isEmpty() && Identifier.isValid(damageTypeString)) {
-                Identifier damageTypeId = Identifier.tryParse(damageTypeString);
-                if (damageTypeId != null) {
-                    RegistryKey<DamageType> key = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, damageTypeId);
-                    Registry<DamageType> registry = attacker.getDamageSources().registry;
-                    Optional<RegistryEntry.Reference<DamageType>> optional = registry.getEntry(key);
-                    optional.ifPresent(damageTypeReference -> cir.setReturnValue(new DamageSource(damageTypeReference, attacker)));
-                }
-            }
-        }
-    }
+	@Inject(method = "playerAttack", at = @At("RETURN"), cancellable = true)
+	public void bettercombatextension$playerAttack(PlayerEntity attacker, CallbackInfoReturnable<DamageSource> cir) {
+		AttackHand attackHand = ((EntityPlayer_BetterCombat) attacker).getCurrentAttack();
+		if (attackHand != null) {
+			String damageTypeString = ((DuckWeaponAttributesAttackMixin) (Object) attackHand.attack()).bettercombatextension$getDamageType();
+			if (damageTypeString != null && !damageTypeString.isEmpty() && Identifier.isValid(damageTypeString)) {
+				Identifier damageTypeId = Identifier.tryParse(damageTypeString);
+				if (damageTypeId != null) {
+					RegistryKey<DamageType> key = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, damageTypeId);
+					Registry<DamageType> registry = attacker.getDamageSources().registry;
+					Optional<RegistryEntry.Reference<DamageType>> optional = registry.getEntry(key);
+					optional.ifPresent(damageTypeReference -> cir.setReturnValue(new DamageSource(damageTypeReference, attacker)));
+				}
+			}
+		}
+	}
 }

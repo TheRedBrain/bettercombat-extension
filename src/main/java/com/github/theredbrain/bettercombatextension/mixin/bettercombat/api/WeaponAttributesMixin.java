@@ -7,17 +7,17 @@ import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(WeaponAttributes.class)
 public class WeaponAttributesMixin implements DuckWeaponAttributesMixin {
-    @Unique
-    private String two_handed_pose = null;
+	@Unique
+	private String two_handed_pose = null;
 
-    @Override
-    public String bettercombatextension$getTwoHandedPose() {
-        return this.two_handed_pose;
-    }
+	@Override
+	public String bettercombatextension$getTwoHandedPose() {
+		return this.two_handed_pose;
+	}
 
-    @Override
-    public void bettercombatextension$setTwoHandedPose(String two_handed_pose) {
-        this.two_handed_pose = two_handed_pose;
-    }
+	@Override
+	public void bettercombatextension$setTwoHandedPose(String two_handed_pose) {
+		this.two_handed_pose = two_handed_pose;
+	}
 
 }

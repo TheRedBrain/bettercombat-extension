@@ -9,16 +9,16 @@ import net.minecraft.entity.player.PlayerEntity;
 
 public class CancelAttackPacketReceiver implements ClientPlayNetworking.PlayPacketHandler<CancelAttackPacket> {
 
-    @Override
-    public void receive(CancelAttackPacket packet, ClientPlayerEntity player, PacketSender responseSender) {
+	@Override
+	public void receive(CancelAttackPacket packet, ClientPlayerEntity player, PacketSender responseSender) {
 
-        int entityId = packet.entityId;
+		int entityId = packet.entityId;
 
-        if (player != null && player.getWorld().getEntityById(entityId) != null) {
-            PlayerEntity player2 = (PlayerEntity) player.getWorld().getEntityById(entityId);
-            if (player2 != null && player == player2) {
-                ((MinecraftClient_BetterCombat)MinecraftClient.getInstance()).cancelUpswing();
-            }
-        }
-    }
+		if (player != null && player.getWorld().getEntityById(entityId) != null) {
+			PlayerEntity player2 = (PlayerEntity) player.getWorld().getEntityById(entityId);
+			if (player2 != null && player == player2) {
+				((MinecraftClient_BetterCombat) MinecraftClient.getInstance()).cancelUpswing();
+			}
+		}
+	}
 }

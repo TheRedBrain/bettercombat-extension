@@ -15,19 +15,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PlayerAttackHelper.class)
 public class PlayerAttackHelperMixin {
 
-    @Inject(method = "isDualWielding", at = @At("RETURN"), cancellable = true)
-    private static void bettercombatextension$isDualWielding(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(cir.getReturnValue() && !(!player.getMainHandStack().isIn(BetterCombatExtension.EMPTY_HAND_WEAPONS) && player.getOffHandStack().isIn(BetterCombatExtension.EMPTY_HAND_WEAPONS)));
-        cir.cancel();
-    }
+	@Inject(method = "isDualWielding", at = @At("RETURN"), cancellable = true)
+	private static void bettercombatextension$isDualWielding(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
+		cir.setReturnValue(cir.getReturnValue() && !(!player.getMainHandStack().isIn(BetterCombatExtension.EMPTY_HAND_WEAPONS) && player.getOffHandStack().isIn(BetterCombatExtension.EMPTY_HAND_WEAPONS)));
+		cir.cancel();
+	}
 
-    /**
-     * @author TheRedBrain
-     * @reason account for alternative two-handing condition
-     */
-    @Overwrite
-    public static boolean isTwoHandedWielding(PlayerEntity player) {
-        WeaponAttributes mainAttributes = WeaponRegistry.getAttributes(player.getMainHandStack());
-        return (mainAttributes != null && mainAttributes.isTwoHanded()) || (player.getOffHandStack().isEmpty() && BetterCombatExtension.serverConfig.empty_offhand_equals_two_handing_mainhand);
-    }
+	/**
+	 * @author TheRedBrain
+	 * @reason account for alternative two-handing condition
+	 */
+	@Overwrite
+	public static boolean isTwoHandedWielding(PlayerEntity player) {
+		WeaponAttributes mainAttributes = WeaponRegistry.getAttributes(player.getMainHandStack());
+		return (mainAttributes != null && mainAttributes.isTwoHanded()) || (player.getOffHandStack().isEmpty() && BetterCombatExtension.serverConfig.empty_offhand_equals_two_handing_mainhand);
+	}
 }

@@ -7,17 +7,17 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 public class AttackStaminaCostPacketReceiver implements ServerPlayNetworking.PlayPacketHandler<AttackStaminaCostPacket> {
 
-    @Override
-    public void receive(AttackStaminaCostPacket packet, ServerPlayerEntity player, PacketSender responseSender) {
+	@Override
+	public void receive(AttackStaminaCostPacket packet, ServerPlayerEntity player, PacketSender responseSender) {
 
-        float staminaCost = packet.staminaCost;
+		float staminaCost = packet.staminaCost;
 
-        if (BetterCombatExtension.isStaminaAttributesLoaded) {
-            if (BetterCombatExtension.getCurrentStamina(player) <= 0 && !player.isCreative()) {
-                ServerPlayNetworking.send(player, new CancelAttackPacket(player.getId()));
-            } else {
-                BetterCombatExtension.addStamina(player, -staminaCost);
-            }
-        }
-    }
+		if (BetterCombatExtension.isStaminaAttributesLoaded) {
+			if (BetterCombatExtension.getCurrentStamina(player) <= 0 && !player.isCreative()) {
+				ServerPlayNetworking.send(player, new CancelAttackPacket(player.getId()));
+			} else {
+				BetterCombatExtension.addStamina(player, -staminaCost);
+			}
+		}
+	}
 }
