@@ -30,6 +30,8 @@ public class BetterCombatExtension implements ModInitializer {
 	public static ServerConfig serverConfig;
 	private static PacketByteBuf serverConfigSerialized = PacketByteBufs.create();
 
+	public static final boolean isShoulderSurfingLoaded = FabricLoader.getInstance().isModLoaded("shouldersurfing");
+
 	public static final boolean isStaminaAttributesLoaded = FabricLoader.getInstance().isModLoaded("staminaattributes");
 
 	public static EntityAttribute ATTACK_STAMINA_COST;

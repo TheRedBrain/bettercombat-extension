@@ -45,6 +45,14 @@ repositories {
 		url 'https://jitpack.io'
 	}
 
+	// Shoulder Surfing Reloaded
+	maven {
+		url "https://www.cursemaven.com"
+		content {
+			includeGroup("curse.maven")
+		}
+	}
+
 }
 
 dependencies {
@@ -64,6 +72,9 @@ dependencies {
 
 	// Better Combat
 	modImplementation "maven.modrinth:better-combat:${project.better_combat}"
+
+	// Shoulder Surfing Reloaded
+	modImplementation("curse.maven:shoulder-surfing-reloaded-243190:${project.shoulder_surfing_file_id}")
 
 	// Stamina Attributes
 	modImplementation "maven.modrinth:stamina-attributes:${project.stamina_attributes}"
@@ -127,6 +138,7 @@ if(project.hasProperty('release_type')) {
 				requiredDependency 'fabric-api'
 				requiredDependency 'cloth-config'
 				requiredDependency 'better-combat-by-daedelus'
+				optionalDependency 'shoulder-surfing-reloaded'
 				optionalDependency 'stamina-attributes'
 			}
 
@@ -157,6 +169,7 @@ if(project.hasProperty('release_type')) {
 			required.project 'fabric-api'
 			required.project 'cloth-config'
 			required.project 'better-combat'
+			optional.project 'shoulder-surfing-reloaded'
 			optional.project 'stamina-attributes'
 		}
 	}

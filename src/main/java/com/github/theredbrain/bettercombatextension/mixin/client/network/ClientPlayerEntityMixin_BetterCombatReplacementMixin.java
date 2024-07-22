@@ -2,6 +2,7 @@ package com.github.theredbrain.bettercombatextension.mixin.client.network;
 
 import com.github.theredbrain.bettercombatextension.BetterCombatExtension;
 import com.github.theredbrain.bettercombatextension.client.DuckMinecraftClientMixin;
+import com.github.theredbrain.bettercombatextension.compatability.ShoulderSurfingCompat;
 import com.mojang.authlib.GameProfile;
 import net.bettercombat.BetterCombat;
 import net.bettercombat.api.MinecraftClient_BetterCombat;
@@ -77,10 +78,14 @@ public abstract class ClientPlayerEntityMixin_BetterCombatReplacementMixin exten
 					var10000.movementForward = (float) ((double) var10000.movementForward * multiplier);
 					var10000 = clientPlayer.input;
 					var10000.movementSideways = (float) ((double) var10000.movementSideways * multiplier);
+
+					if (ShoulderSurfingCompat.isShoulderSurfingCameraDecoupled() && BetterCombatExtension.serverConfig.disable_player_yaw_changes_during_attacks) {
+						var10000 = clientPlayer.input;
+						var10000.movementSideways = 0.0F;
+					}
 				}
 
 			}
 		}
 	}
-
 }
