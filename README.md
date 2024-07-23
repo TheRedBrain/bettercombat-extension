@@ -100,6 +100,8 @@ While attacking with items in the item tag "bettercombatextension:tags/items/ign
 
 When the [Stamina Attributes](https://modrinth.com/mod/stamina-attributes) mod is installed, every attack has a stamina cost. When the stamina cost is greater 0 and the player has less than 1 stamina, the attack is canceled.
 
+The new entity attribute "generic:attack_stamina_cost" has a default base value of 1.0.
+
 The cost is calculated like so:
 
 ```
