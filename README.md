@@ -8,7 +8,7 @@ It adds several new features and settings which are all controlled from the serv
 In addition to the existing fields 'pose' and 'offhand_pose' there is an optional String field called 'two_handed_pose'.
 
 Each attack element has two new optional fields:
-- an int field called 'attack_stamina_cost_multiplier'
+- an int field called 'stamina_cost_multiplier'
 - a String field called 'damage_type', when this is a valid identifier for a damage type, the attack deals damage using that damage type
 
 ### Example
@@ -23,7 +23,7 @@ Each attack element has two new optional fields:
 			{
 				"hitbox": "HORIZONTAL_PLANE",
 				"damage_multiplier": 1,
-				"attack_stamina_cost_multiplier": 1,
+				"stamina_cost_multiplier": 1,
 				"angle": 120,
 				"upswing": 0.5,
 				"animation": "bettercombat:one_handed_slash_horizontal_right",
@@ -34,7 +34,7 @@ Each attack element has two new optional fields:
 			{
 				"hitbox": "HORIZONTAL_PLANE",
 				"damage_multiplier": 1,
-				"attack_stamina_cost_multiplier": 1,
+				"stamina_cost_multiplier": 1,
 				"angle": 120,
 				"upswing": 0.5,
 				"animation": "bettercombat:one_handed_slash_horizontal_left",
@@ -45,7 +45,7 @@ Each attack element has two new optional fields:
 			{
 				"hitbox": "FORWARD_BOX",
 				"damage_multiplier": 1,
-				"attack_stamina_cost_multiplier": 1.1,
+				"stamina_cost_multiplier": 1.1,
 				"angle": 0,
 				"upswing": 0.5,
 				"animation": "bettercombat:one_handed_stab",
@@ -105,11 +105,11 @@ The new entity attribute "generic:attack_stamina_cost" has a default base value 
 The cost is calculated like so:
 
 ```
-stamina_cost = (value of "generic:attack_stamina_cost" entity attribute) * ("attack_stamina_cost_multiplier" of the attack) * ("global_attack_stamina_cost_multiplier" setting in the server config")
+stamina_cost = (value of "generic:attack_stamina_cost" entity attribute) * ("stamina_cost_multiplier" of the attack) * ("global_attack_stamina_cost_multiplier" setting in the server config")
 ```
 
 If the attack is feinted, the cost is calculated like so:
 
 ```
-stamina_cost = (value of "generic:attack_stamina_cost" entity attribute) * ("attack_stamina_cost_multiplier" of the attack) * ("global_feint_stamina_cost_multiplier" setting in the server config")
+stamina_cost = (value of "generic:attack_stamina_cost" entity attribute) * ("stamina_cost_multiplier" of the attack) * ("global_feint_stamina_cost_multiplier" setting in the server config")
 ```
