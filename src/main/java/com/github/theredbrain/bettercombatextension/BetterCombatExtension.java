@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.item.Item;
@@ -91,6 +92,8 @@ public class BetterCombatExtension implements ModInitializer {
 		return new Identifier(MOD_ID, path);
 	}
 
+	public static final TagKey<EntityType<?>> DISABLES_MOVEMENT_LOCKING_WHEN_RIDDEN = TagKey.of(RegistryKeys.ENTITY_TYPE, identifier("disables_movement_locking_when_ridden"));
+	public static final TagKey<Item> DISABLES_MOVEMENT_LOCKING_DURING_ATTACK = TagKey.of(RegistryKeys.ITEM, identifier("disables_movement_locking_during_attack"));
 	public static final TagKey<Item> IGNORES_ATTACK_MOVEMENT_PENALTY = TagKey.of(RegistryKeys.ITEM, identifier("ignores_attack_movement_penalty"));
 	public static final TagKey<Item> EMPTY_HAND_WEAPONS = TagKey.of(RegistryKeys.ITEM, identifier("empty_hand_weapons"));
 }
