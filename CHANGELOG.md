@@ -1,3 +1,10 @@
+# 1.3.0
+
+- added 'attack_pitch_range' config option
+- added 'disable_jumping_during_attacks' config option
+- changed "restrict_attack_pitch" config option to also affect the attack hitbox
+- fixed "enable_movement_locking_attacks" config option always preventing the player from moving
+
 # 1.2.0
 
 - Attack stamina cost calculation has been changed.

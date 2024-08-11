@@ -58,8 +58,33 @@ Each attack element has two new optional fields:
 	}
 }
 ```
+## Server Config
+### Movement Locking Attacks
 
-## Toggleable Two-Handed Stance
+Setting the "enable_movement_locking_attacks" setting in the server config to true, enables movement locking attacks.
+This prevents the player from changing its orientation and position while a attack animation is active.
+
+It is recommended to use the client-side mod [Shoulder Surfing Reloaded](https://modrinth.com/mod/shoulder-surfing-reloaded) and enable its "decoupled camera" setting when this setting is active.
+
+The item tag "bettercombatextension:tags/items/disables_movement_locking_during_attack" and the entity type tag "bettercombatextension:tags/entity_types/disables_movement_locking_when_ridden" are used to control when the movement locking is applied.
+
+Note that Better Combats "movement_speed_while_attacking" movement speed multiplier has no effect while this option is enabled.
+
+### Restricting attack pitch
+
+Setting the "restrict_attack_pitch" setting in the server config to true, restricts the attack pitch to a range defined by the "attack_pitch_range" server config setting.
+
+This affects the animation and the attack hitbox.
+
+### Exceptions to Better Combats "movement_speed_while_attacking" movement speed multiplier
+
+While attacking with items in the item tag "bettercombatextension:tags/items/ignores_attack_movement_penalty" the multiplier is not applied.
+
+### Disabling Better Combats "Hold to attack" client setting
+
+Enabled when "disable_better_combat_hold_to_attack" setting in server config is true.
+
+### Toggleable Two-Handed Stance
 
 Enabled when "empty_offhand_equals_two_handing_mainhand" setting in server config is true.
 
@@ -69,34 +94,11 @@ If the offhand slot is empty, the idle pose defined via the "two_handed_pose" fi
 
 This is designed to work together with the mod [RPG Inventory](https://modrinth.com/mod/rpg-inventory).
 
-## Movement Locking Attacks
-
-Setting the "enable_movement_locking_attacks" setting in the server config to true, enables movement locking attacks.
-This prevents the player from changing its orientation and position while a attack animation is active.
-
-It is recommended to use the client-side mod [Shoulder Surfing Reloaded](https://modrinth.com/mod/shoulder-surfing-reloaded) and enable its "decoupled camera" setting when this setting is active.
-
-The item tag "bettercombatextension:tags/items/disables_movement_locking_during_attack" and the entity type tag "bettercombatextension:tags/entity_types/disables_movement_locking_when_ridden" are used to control when the movement locking is applied.
-
-## Skipping attacks with feinting
+### Skipping attacks with feinting
 
 Enabled when "feinting_increases_combo_count" setting in server config is true.
 
-## Disabling Better Combats "Hold to attack" client setting
-
-Enabled when "disable_better_combat_hold_to_attack" setting in server config is true.
-
-## WIP Restricting attack pitch
-
-Enabled when "restrict_attack_pitch" setting in server config is true.
-
-Currently, this only affects the animation.
-
-## Exceptions to Better Combats "movement_speed_while_attacking" movement speed multiplier
-
-While attacking with items in the item tag "bettercombatextension:tags/items/ignores_attack_movement_penalt" the multiplier is not applied.
-
-## Stamina Attributes Integration
+### Stamina Attributes Integration
 
 When the [Stamina Attributes](https://modrinth.com/mod/stamina-attributes) mod is installed, every attack has a stamina cost. When the stamina cost is greater 0 and the player has less than 1 stamina, the attack is canceled.
 

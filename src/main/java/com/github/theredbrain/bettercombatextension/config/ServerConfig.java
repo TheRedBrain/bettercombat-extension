@@ -10,7 +10,7 @@ import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 public class ServerConfig implements ConfigData {
 	@Comment("""
 			When set to true, changing the players orientation and position while attacking is disabled.
-			It is recommended to install Shoulder Surfing Reloaded, play in the third person perspective activate the decoupled camera setting.
+			It is recommended to install Shoulder Surfing Reloaded, play in the third person perspective and activate the decoupled camera setting.
 			Since the movement_multiplier setting in the Better Combat server config has no effect when this is set to true, it is recommended to set it to its default of 1.0.
 			Use the item tag "disables_movement_locking_during_attack" and the entity type tag "disables_movement_locking_when_ridden" to control when the movement locking is applied.
 			
@@ -18,13 +18,25 @@ public class ServerConfig implements ConfigData {
 			""")
 	public boolean enable_movement_locking_attacks = false;
 	@Comment("""
-			WIP
+			When set to true, jumping is disabled during attacks.
+			Use the item tag "disables_jump_restriction_during_attack" and the entity type tag "disables_jump_restriction_when_ridden" to control when the jump restriction is applied.
+			
+			Default: false
+			""")
+	public boolean enable_jump_restriction_during_attacks = false;
+	@Comment("""
 			When set to true, the pitch of the players attack is restricted.
-			This currently only affects the animation.
 			
 			Default: false
 			""")
 	public boolean restrict_attack_pitch = false;
+	@Comment("""
+			Only has an effect when 'restrict_attack_pitch' is set to 'true'.
+			Describes the angle from 0, which means the final range is from -'attack_pitch_range' to 'attack_pitch_range'.
+			
+			Default: 15.0
+			""")
+	public float attack_pitch_range = 15.0F;
 	@Comment("""
 			Enables an alternative two_handed condition.
 			If the offhand stack is empty and this is true, the mainhand stack is two_handed

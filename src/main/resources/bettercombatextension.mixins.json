@@ -7,6 +7,7 @@
 		"bettercombat.api.WeaponAttributesAttackMixin",
 		"bettercombat.api.WeaponAttributesHelperMixin",
 		"bettercombat.api.WeaponAttributesMixin",
+		"bettercombat.client.collision.TargetFinderMixin",
 		"entity.LivingEntityMixin",
 		"entity.attribute.EntityAttributesMixin",
 		"entity.damage.DamageSourcesMixin"

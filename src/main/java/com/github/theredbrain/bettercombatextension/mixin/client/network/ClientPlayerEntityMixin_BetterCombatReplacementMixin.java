@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Environment(EnvType.CLIENT)
 @Mixin(ClientPlayerEntity.class)
+@SuppressWarnings("UnreachableCode")
 public abstract class ClientPlayerEntityMixin_BetterCombatReplacementMixin extends AbstractClientPlayerEntity {
 
 	@Shadow
@@ -83,14 +84,22 @@ public abstract class ClientPlayerEntityMixin_BetterCombatReplacementMixin exten
 			}
 		}
 		var betterCombatExtensionServerConfig = BetterCombatExtension.serverConfig;
-		boolean isMovementLockingDisabled = activeItemStack.isIn(BetterCombatExtension.DISABLES_MOVEMENT_LOCKING_DURING_ATTACK) && isWeaponSwingInProgress;
-		if (betterCombatExtensionServerConfig.enable_movement_locking_attacks && !isMovementLockingDisabled) {
+		boolean isMovementLockingDisabled = activeItemStack.isIn(BetterCombatExtension.DISABLES_MOVEMENT_LOCKING_DURING_ATTACK);
+		if (betterCombatExtensionServerConfig.enable_movement_locking_attacks && !isMovementLockingDisabled && isWeaponSwingInProgress) {
 			boolean isVehicleDisablingMovementLocking = clientPlayer.getVehicle() != null && clientPlayer.getVehicle().getType().isIn(BetterCombatExtension.DISABLES_MOVEMENT_LOCKING_WHEN_RIDDEN);
-			if (!clientPlayer.hasVehicle() || isVehicleDisablingMovementLocking) {
+			if (!clientPlayer.hasVehicle() || !isVehicleDisablingMovementLocking) {
 				Input var10000 = clientPlayer.input;
 				var10000.movementForward = 0.0F;
 				var10000 = clientPlayer.input;
 				var10000.movementSideways = 0.0F;
+			}
+		}
+		boolean isJumpRestrictionDisabled = activeItemStack.isIn(BetterCombatExtension.DISABLES_JUMP_RESTRICTION_DURING_ATTACK);
+		if (betterCombatExtensionServerConfig.enable_jump_restriction_during_attacks && !isJumpRestrictionDisabled && isWeaponSwingInProgress) {
+			boolean isVehicleDisablingJumpRestriction = clientPlayer.getVehicle() != null && clientPlayer.getVehicle().getType().isIn(BetterCombatExtension.DISABLES_JUMP_RESTRICTION_WHEN_RIDDEN);
+			if (!clientPlayer.hasVehicle() || !isVehicleDisablingJumpRestriction) {
+				Input var10000 = clientPlayer.input;
+				var10000.jumping = false;
 			}
 		}
 	}

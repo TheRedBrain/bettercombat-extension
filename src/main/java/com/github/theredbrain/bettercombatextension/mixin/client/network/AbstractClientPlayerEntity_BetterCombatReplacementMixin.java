@@ -2,6 +2,7 @@ package com.github.theredbrain.bettercombatextension.mixin.client.network;
 
 import com.github.theredbrain.bettercombatextension.BetterCombatExtension;
 import com.github.theredbrain.bettercombatextension.bettercombat.DuckWeaponAttributesMixin;
+import com.github.theredbrain.bettercombatextension.config.ServerConfig;
 import com.mojang.authlib.GameProfile;
 import dev.kosmx.playerAnim.api.firstPerson.FirstPersonConfiguration;
 import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
@@ -162,55 +163,48 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
 	@Unique
 	private AdjustmentModifier createAttackAdjustment() {
 		return new AdjustmentModifier((partName) -> {
-			if (BetterCombatExtension.serverConfig.restrict_attack_pitch) {
-				// TODO find a range of angles where the animations look good and restrict the attack adjustment to that range
-				//  also apply that range to the hit boxes
-				return Optional.empty();
-			} else {
-				float rotationX = 0.0F;
-				float rotationY = 0.0F;
-				float rotationZ = 0.0F;
-				float offsetX = 0.0F;
-				float offsetY = 0.0F;
-				float offsetZ = 0.0F;
-				float pitch;
-				if (FirstPersonMode.isFirstPersonPass()) {
-					pitch = this.getPitch();
-					pitch = (float) Math.toRadians((double) pitch);
-					switch (partName) {
-						case "body":
-							rotationX -= pitch;
-							if (pitch < 0.0F) {
-								double offset = Math.abs(Math.sin((double) pitch));
-								offsetY = (float) ((double) offsetY + offset * 0.5);
-								offsetZ = (float) ((double) offsetZ - offset);
-							}
-							break;
-						default:
-							return Optional.empty();
-					}
-				} else {
-					pitch = this.getPitch();
-					pitch = (float) Math.toRadians((double) pitch);
-					switch (partName) {
-						case "body":
-							rotationX -= pitch * 0.75F;
-							break;
-						case "rightArm":
-						case "leftArm":
-							rotationX += pitch * 0.25F;
-							break;
-						case "rightLeg":
-						case "leftLeg":
-							rotationX = (float) ((double) rotationX - (double) pitch * 0.75);
-							break;
-						default:
-							return Optional.empty();
-					}
+			float rotationX = 0.0F;
+			float rotationY = 0.0F;
+			float rotationZ = 0.0F;
+			float offsetX = 0.0F;
+			float offsetY = 0.0F;
+			float offsetZ = 0.0F;
+			float pitch;
+			ServerConfig serverConfig = BetterCombatExtension.serverConfig;
+			pitch = serverConfig.restrict_attack_pitch ? MathHelper.clamp(this.getPitch(), -serverConfig.attack_pitch_range, serverConfig.attack_pitch_range) : this.getPitch();
+			pitch = (float) Math.toRadians((double) pitch);
+			if (FirstPersonMode.isFirstPersonPass()) {
+				switch (partName) {
+					case "body":
+						rotationX -= pitch;
+						if (pitch < 0.0F) {
+							double offset = Math.abs(Math.sin((double) pitch));
+							offsetY = (float) ((double) offsetY + offset * 0.5);
+							offsetZ = (float) ((double) offsetZ - offset);
+						}
+						break;
+					default:
+						return Optional.empty();
 				}
-
-				return Optional.of(new AdjustmentModifier.PartModifier(new Vec3f(rotationX, rotationY, rotationZ), new Vec3f(offsetX, offsetY, offsetZ)));
+			} else {
+				switch (partName) {
+					case "body":
+						rotationX -= pitch * 0.75F;
+						break;
+					case "rightArm":
+					case "leftArm":
+						rotationX += pitch * 0.25F;
+						break;
+					case "rightLeg":
+					case "leftLeg":
+						rotationX = (float) ((double) rotationX - (double) pitch * 0.75);
+						break;
+					default:
+						return Optional.empty();
+				}
 			}
+
+			return Optional.of(new AdjustmentModifier.PartModifier(new Vec3f(rotationX, rotationY, rotationZ), new Vec3f(offsetX, offsetY, offsetZ)));
 		});
 	}
 
