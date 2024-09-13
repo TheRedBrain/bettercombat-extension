@@ -1,33 +1,24 @@
 package com.github.theredbrain.bettercombatextension.network.packet;
 
 import com.github.theredbrain.bettercombatextension.BetterCombatExtension;
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
-import net.fabricmc.fabric.api.networking.v1.PacketType;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.packet.CustomPayload;
 
-public class AttackStaminaCostPacket implements FabricPacket {
-	public static final PacketType<AttackStaminaCostPacket> TYPE = PacketType.create(
-			BetterCombatExtension.identifier("attack_stamina_cost"),
-			AttackStaminaCostPacket::new
-	);
+public record AttackStaminaCostPacket(float staminaCost) implements CustomPayload {
+	public static final CustomPayload.Id<AttackStaminaCostPacket> PACKET_ID = new CustomPayload.Id<>(BetterCombatExtension.identifier("attack_stamina_cost"));
+	public static final PacketCodec<RegistryByteBuf, AttackStaminaCostPacket> PACKET_CODEC = PacketCodec.of(AttackStaminaCostPacket::write, AttackStaminaCostPacket::new);
 
-	public final float staminaCost;
-
-	public AttackStaminaCostPacket(float staminaCost) {
-		this.staminaCost = staminaCost;
+	public AttackStaminaCostPacket(RegistryByteBuf registryByteBuf) {
+		this(registryByteBuf.readFloat());
 	}
 
-	public AttackStaminaCostPacket(PacketByteBuf buf) {
-		this(buf.readFloat());
+	private void write(RegistryByteBuf registryByteBuf) {
+		registryByteBuf.writeFloat(staminaCost);
 	}
 
 	@Override
-	public PacketType<?> getType() {
-		return TYPE;
-	}
-
-	@Override
-	public void write(PacketByteBuf buf) {
-		buf.writeFloat(this.staminaCost);
+	public CustomPayload.Id<? extends CustomPayload> getId() {
+		return PACKET_ID;
 	}
 }

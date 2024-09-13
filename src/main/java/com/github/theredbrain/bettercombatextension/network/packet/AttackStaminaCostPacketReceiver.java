@@ -1,16 +1,16 @@
 package com.github.theredbrain.bettercombatextension.network.packet;
 
 import com.github.theredbrain.bettercombatextension.BetterCombatExtension;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-public class AttackStaminaCostPacketReceiver implements ServerPlayNetworking.PlayPacketHandler<AttackStaminaCostPacket> {
+public class AttackStaminaCostPacketReceiver implements ServerPlayNetworking.PlayPayloadHandler<AttackStaminaCostPacket> {
 
 	@Override
-	public void receive(AttackStaminaCostPacket packet, ServerPlayerEntity player, PacketSender responseSender) {
+	public void receive(AttackStaminaCostPacket payload, ServerPlayNetworking.Context context) {
 
-		float staminaCost = packet.staminaCost;
+		float staminaCost = payload.staminaCost();
+		ServerPlayerEntity player = context.player();
 
 		if (BetterCombatExtension.isStaminaAttributesLoaded) {
 			if (BetterCombatExtension.getCurrentStamina(player) <= 0 && !player.isCreative()) {

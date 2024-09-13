@@ -3,7 +3,7 @@ package com.github.theredbrain.bettercombatextension.mixin.client.network;
 import com.github.theredbrain.bettercombatextension.BetterCombatExtension;
 import com.github.theredbrain.bettercombatextension.client.DuckMinecraftClientMixin;
 import com.mojang.authlib.GameProfile;
-import net.bettercombat.BetterCombat;
+import net.bettercombat.BetterCombatMod;
 import net.bettercombat.api.MinecraftClient_BetterCombat;
 import net.bettercombat.config.ServerConfig;
 import net.bettercombat.utils.MathHelper;
@@ -55,7 +55,7 @@ public abstract class ClientPlayerEntityMixin_BetterCombatReplacementMixin exten
 	)
 	public void bettercombatextension$tickMovement(CallbackInfo ci) {
 		boolean isWeaponSwingInProgress = ((MinecraftClient_BetterCombat) this.client).isWeaponSwingInProgress();
-		ServerConfig config = BetterCombat.config;
+		ServerConfig config = BetterCombatMod.config;
 		double multiplier = Math.min(Math.max((double) config.movement_speed_while_attacking, 0.0), 1.0);
 		ItemStack activeItemStack = this.getStackInHand(((DuckMinecraftClientMixin) this.client).bettercombatextension$getCurrentAttackHand());
 		boolean isMovementPenaltyIgnored = activeItemStack.isIn(BetterCombatExtension.IGNORES_ATTACK_MOVEMENT_PENALTY) && isWeaponSwingInProgress;

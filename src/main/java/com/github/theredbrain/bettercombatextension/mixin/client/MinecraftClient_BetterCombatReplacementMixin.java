@@ -6,16 +6,16 @@ import com.github.theredbrain.bettercombatextension.client.DuckMinecraftClientMi
 import com.github.theredbrain.bettercombatextension.config.ServerConfig;
 import com.github.theredbrain.bettercombatextension.entity.DuckLivingEntityMixin;
 import com.github.theredbrain.bettercombatextension.network.packet.AttackStaminaCostPacket;
-import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.autoconfig.AutoConfig;
-import net.bettercombat.BetterCombat;
+import net.bettercombat.BetterCombatMod;
+import net.bettercombat.Platform;
 import net.bettercombat.PlatformClient;
 import net.bettercombat.api.AttackHand;
 import net.bettercombat.api.MinecraftClient_BetterCombat;
 import net.bettercombat.api.WeaponAttributes;
 import net.bettercombat.api.client.BetterCombatClientEvents;
-import net.bettercombat.client.BetterCombatClient;
-import net.bettercombat.client.BetterCombatKeybindings;
+import net.bettercombat.client.BetterCombatClientMod;
+import net.bettercombat.client.Keybindings;
 import net.bettercombat.client.animation.PlayerAttackAnimatable;
 import net.bettercombat.client.collision.TargetFinder;
 import net.bettercombat.config.ClientConfigWrapper;
@@ -27,11 +27,9 @@ import net.bettercombat.mixin.client.MinecraftClientAccessor;
 import net.bettercombat.network.Packets;
 import net.bettercombat.utils.PatternMatching;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.RunArgs;
-import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.resource.language.I18n;
@@ -45,6 +43,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -55,7 +54,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 @Mixin({MinecraftClient.class})
 public abstract class MinecraftClient_BetterCombatReplacementMixin implements MinecraftClient_BetterCombat, DuckMinecraftClientMixin {
@@ -67,14 +65,11 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	private int itemUseCooldown;
 	@Shadow
 	public int attackCooldown;
+	@Shadow @Final public InGameHud inGameHud;
 	@Unique
 	private boolean isHoldingAttackInput = false;
 	@Unique
 	private boolean isHarvesting = false;
-	@Unique
-	private String textToRender = null;
-	@Unique
-	private int textFade = 0;
 	@Unique
 	private ItemStack upswingStack;
 	@Unique
@@ -99,59 +94,11 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	}
 
 	@Inject(
-			method = {"<init>"},
-			at = {@At("TAIL")}
-	)
-	private void postInit(RunArgs args, CallbackInfo ci) {
-		this.setupTextRenderer();
-	}
-
-	@Inject(
 			method = {"disconnect(Lnet/minecraft/client/gui/screen/Screen;)V"},
 			at = {@At("TAIL")}
 	)
 	private void disconnect_TAIL(Screen screen, CallbackInfo ci) {
-		BetterCombatClient.ENABLED = false;
-	}
-
-	@Unique
-	private void setupTextRenderer() {
-		HudRenderCallback.EVENT.register((context, f) -> {
-			if (this.textToRender != null && !this.textToRender.isEmpty()) {
-				MinecraftClient client = MinecraftClient.getInstance();
-				TextRenderer textRenderer = client.inGameHud.getTextRenderer();
-				int scaledWidth = client.getWindow().getScaledWidth();
-				int scaledHeight = client.getWindow().getScaledHeight();
-				int i = textRenderer.getWidth(this.textToRender);
-				int j = (scaledWidth - i) / 2;
-				int k = scaledHeight - 59 - 14;
-				if (!client.interactionManager.hasStatusBars()) {
-					k += 14;
-				}
-
-				int l;
-				if ((l = (int) ((float) this.textFade * 256.0F / 10.0F)) > 255) {
-					l = 255;
-				}
-
-				if (l > 0) {
-					RenderSystem.enableBlend();
-					RenderSystem.defaultBlendFunc();
-					int var10001 = j - 2;
-					int var10002 = k - 2;
-					int var10003 = j + i + 2;
-					Objects.requireNonNull(textRenderer);
-					context.fill(var10001, var10002, var10003, k + 9 + 2, client.options.getTextBackgroundColor(0));
-					context.drawTextWithShadow(textRenderer, this.textToRender, j, k, 16777215 + (l << 24));
-					RenderSystem.disableBlend();
-				}
-			}
-
-			if (this.textFade <= 0) {
-				this.textToRender = null;
-			}
-
-		});
+		BetterCombatClientMod.ENABLED = false;
 	}
 
 	@Inject(
@@ -160,7 +107,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 			cancellable = true
 	)
 	private void pre_doAttack(CallbackInfoReturnable<Boolean> info) {
-		if (BetterCombatClient.ENABLED) {
+		if (BetterCombatClientMod.ENABLED) {
 			MinecraftClient client = this.thisClient();
 			ItemStack mainHandStack = client.player.getMainHandStack();
 			WeaponAttributes attributes = WeaponRegistry.getAttributes(mainHandStack);
@@ -184,7 +131,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 			cancellable = true
 	)
 	private void pre_handleBlockBreaking(boolean bl, CallbackInfo ci) {
-		if (BetterCombatClient.ENABLED) {
+		if (BetterCombatClientMod.ENABLED) {
 			MinecraftClient client = this.thisClient();
 			ItemStack mainHandStack = client.player.getMainHandStack();
 			WeaponAttributes attributes = WeaponRegistry.getAttributes(mainHandStack);
@@ -199,7 +146,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 					ci.cancel();
 				}
 
-				if (BetterCombatClient.config.isHoldToAttackEnabled && !BetterCombatExtension.serverConfig.disable_better_combat_hold_to_attack && isPressed) {
+				if (BetterCombatClientMod.config.isHoldToAttackEnabled && !BetterCombatExtension.serverConfig.disable_better_combat_hold_to_attack && isPressed) {
 					this.isHoldingAttackInput = true;
 					this.startUpswing(attributes);
 					ci.cancel();
@@ -218,7 +165,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 			cancellable = true
 	)
 	private void pre_doItemUse(CallbackInfo ci) {
-		if (BetterCombatClient.ENABLED) {
+		if (BetterCombatClientMod.ENABLED) {
 			AttackHand hand = this.getCurrentHand();
 			if (hand != null) {
 				double upswingRate = hand.upswingRate();
@@ -232,10 +179,10 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 
 	@Unique
 	private boolean isTargetingMineableBlock() {
-		if (!BetterCombatClient.config.isMiningWithWeaponsEnabled) {
+		if (!BetterCombatClientMod.config.isMiningWithWeaponsEnabled) {
 			return false;
 		} else {
-			String regex = BetterCombatClient.config.mineWithWeaponBlacklist;
+			String regex = BetterCombatClientMod.config.mineWithWeaponBlacklist;
 			if (regex != null && !regex.isEmpty()) {
 				ItemStack itemStack = this.player.getMainHandStack();
 				String id = Registries.ITEM.getId(itemStack.getItem()).toString();
@@ -244,7 +191,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 				}
 			}
 
-			if (BetterCombatClient.config.isAttackInsteadOfMineWhenEnemiesCloseEnabled && this.hasTargetsInReach()) {
+			if (BetterCombatClientMod.config.isAttackInsteadOfMineWhenEnemiesCloseEnabled && this.hasTargetsInReach()) {
 				return false;
 			} else {
 				MinecraftClient client = this.thisClient();
@@ -269,10 +216,10 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 
 	@Unique
 	private boolean shouldSwingThruGrass() {
-		if (!BetterCombatClient.config.isSwingThruGrassEnabled) {
+		if (!BetterCombatClientMod.config.isSwingThruGrassEnabled) {
 			return false;
 		} else {
-			String regex = BetterCombatClient.config.swingThruGrassBlacklist;
+			String regex = BetterCombatClientMod.config.swingThruGrassBlacklist;
 			if (regex != null && !regex.isEmpty()) {
 				ItemStack itemStack = this.player.getMainHandStack();
 				String id = Registries.ITEM.getId(itemStack.getItem()).toString();
@@ -299,7 +246,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 					this.upswingStack = this.player.getMainHandStack();
 					float attackCooldownTicksFloat = PlayerAttackHelper.getAttackCooldownTicksCapped(this.player);
 					int attackCooldownTicks = Math.round(attackCooldownTicksFloat);
-					this.comboReset = Math.round(attackCooldownTicksFloat * BetterCombat.config.combo_reset_rate);
+					this.comboReset = Math.round(attackCooldownTicksFloat * BetterCombatMod.config.combo_reset_rate);
 					this.upswingTicks = Math.max(Math.round(attackCooldownTicksFloat * upswingRate), 1);
 					this.lastSwingDuration = attackCooldownTicksFloat;
 					this.itemUseCooldown = attackCooldownTicks;
@@ -308,8 +255,8 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 					boolean isOffHand = hand.isOffHand();
 					AnimatedHand animatedHand = AnimatedHand.from(isOffHand, attributes.isTwoHanded());
 					((PlayerAttackAnimatable) this.player).playAttackAnimation(animationName, animatedHand, attackCooldownTicksFloat, upswingRate);
-					ClientPlayNetworking.send(Packets.AttackAnimation.ID, (new Packets.AttackAnimation(this.player.getId(), animatedHand, animationName, attackCooldownTicksFloat, upswingRate)).write());
-//                    ClientPlayNetworking.send(new AttackStaminaCostPacket(((DuckWeaponAttributesAttackMixin) (Object) hand.attack()).bettercombatextension$getStaminaCost()));
+					Packets.AttackAnimation packet = new Packets.AttackAnimation(this.player.getId(), animatedHand, animationName, attackCooldownTicksFloat, upswingRate);
+					Platform.networkC2S_Send(packet);
 					BetterCombatClientEvents.ATTACK_START.invoke((handler) -> {
 						handler.onPlayerAttackStart(this.player, hand);
 					});
@@ -351,7 +298,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 
 	@Unique
 	private boolean shouldUpdateTargetsInReach() {
-		if (!BetterCombatClient.config.isHighlightCrosshairEnabled && !BetterCombatClient.config.isAttackInsteadOfMineWhenEnemiesCloseEnabled) {
+		if (!BetterCombatClientMod.config.isHighlightCrosshairEnabled && !BetterCombatClientMod.config.isAttackInsteadOfMineWhenEnemiesCloseEnabled) {
 			return false;
 		} else {
 			return this.targetsInReach == null;
@@ -399,17 +346,12 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	)
 	private void post_Tick(CallbackInfo ci) {
 		if (this.player != null) {
-			if (BetterCombatKeybindings.toggleMineKeyBinding.wasPressed()) {
-				BetterCombatClient.config.isMiningWithWeaponsEnabled = !BetterCombatClient.config.isMiningWithWeaponsEnabled;
+			if (Keybindings.toggleMineKeyBinding.wasPressed()) {
+				BetterCombatClientMod.config.isMiningWithWeaponsEnabled = !BetterCombatClientMod.config.isMiningWithWeaponsEnabled;
 				AutoConfig.getConfigHolder(ClientConfigWrapper.class).save();
-				this.textToRender = I18n.translate(BetterCombatClient.config.isMiningWithWeaponsEnabled ? "hud.bettercombat.mine_with_weapons_on" : "hud.bettercombat.mine_with_weapons_off", new Object[0]);
-				this.textFade = 40;
+				String message = I18n.translate(BetterCombatClientMod.config.isMiningWithWeaponsEnabled ? "hud.bettercombat.mine_with_weapons_on" : "hud.bettercombat.mine_with_weapons_off", new Object[0]);
+				this.inGameHud.setOverlayMessage(Text.literal(message), false);
 			}
-
-			if (this.textFade > 0) {
-				--this.textFade;
-			}
-
 		}
 	}
 
@@ -417,16 +359,16 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	private void performAttack() {
 		ServerConfig serverConfig = BetterCombatExtension.serverConfig;
 		if (this.player != null) {
-			if (BetterCombatKeybindings.feintKeyBinding.isPressed()) {
+			if (Keybindings.feintKeyBinding.isPressed()) {
 				this.player.resetLastAttackedTicks();
 				this.cancelWeaponSwing();
+				AttackHand hand = this.getCurrentHand();
+				if (hand != null && BetterCombatExtension.isStaminaAttributesLoaded) {
+					ClientPlayNetworking.send(new AttackStaminaCostPacket(((DuckLivingEntityMixin) this.player).bettercombatextension$getAttackStaminaCost() * ((DuckWeaponAttributesAttackMixin) (Object) hand.attack()).bettercombatextension$getStaminaCostMultiplier() * serverConfig.global_feint_stamina_cost_multiplier));
+				}
 				// feinting an attack increases combo count
 				if (serverConfig.feinting_increases_combo_count) {
 					this.setComboCount(this.getComboCount() + 1);
-					AttackHand hand = this.getCurrentHand();
-					if (hand != null && BetterCombatExtension.isStaminaAttributesLoaded) {
-						ClientPlayNetworking.send(new AttackStaminaCostPacket(((DuckLivingEntityMixin) this.player).bettercombatextension$getAttackStaminaCost() * ((DuckWeaponAttributesAttackMixin) (Object) hand.attack()).bettercombatextension$getStaminaCostMultiplier() * serverConfig.global_feint_stamina_cost_multiplier));
-					}
 				}
 			} else {
 				AttackHand hand = this.getCurrentHand();
@@ -444,11 +386,12 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 							PlatformClient.onEmptyLeftClick(this.player);
 						}
 
-						ClientPlayNetworking.send(Packets.C2S_AttackRequest.ID, (new Packets.C2S_AttackRequest(this.getComboCount(), this.player.isSneaking(), this.player.getInventory().selectedSlot, targets)).write());
-						Iterator var7 = targets.iterator();
+						Packets.C2S_AttackRequest packet = new Packets.C2S_AttackRequest(this.getComboCount(), this.player.isSneaking(), this.player.getInventory().selectedSlot, targets);
+						Platform.networkC2S_Send(packet);
+						Iterator var8 = targets.iterator();
 
-						while (var7.hasNext()) {
-							Entity target = (Entity) var7.next();
+						while(var8.hasNext()) {
+							Entity target = (Entity)var8.next();
 							this.player.attack(target);
 						}
 
@@ -499,9 +442,10 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 
 	@Unique
 	private void cancelWeaponSwing() {
-		int downWind = (int) Math.round((double) PlayerAttackHelper.getAttackCooldownTicksCapped(this.player) * (1.0 - 0.5 * (double) BetterCombat.config.upswing_multiplier));
+		int downWind = (int) Math.round((double) PlayerAttackHelper.getAttackCooldownTicksCapped(this.player) * (1.0 - 0.5 * (double) BetterCombatMod.config.upswing_multiplier));
 		((PlayerAttackAnimatable) this.player).stopAttackAnimation((float) downWind);
-		ClientPlayNetworking.send(Packets.AttackAnimation.ID, Packets.AttackAnimation.stop(this.player.getId(), downWind).write());
+		Packets.AttackAnimation packet = Packets.AttackAnimation.stop(this.player.getId(), downWind);
+		Platform.networkC2S_Send(packet);
 		this.upswingStack = null;
 		this.itemUseCooldown = 0;
 		this.setMiningCooldown(0);

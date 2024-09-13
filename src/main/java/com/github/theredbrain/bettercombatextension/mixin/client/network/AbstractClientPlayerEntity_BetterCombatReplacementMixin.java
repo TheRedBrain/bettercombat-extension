@@ -16,11 +16,11 @@ import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
-import net.bettercombat.BetterCombat;
+import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
+import net.bettercombat.BetterCombatMod;
 import net.bettercombat.Platform;
 import net.bettercombat.api.WeaponAttributes;
-import net.bettercombat.client.BetterCombatClient;
-import net.bettercombat.client.animation.AnimationRegistry;
+import net.bettercombat.client.BetterCombatClientMod;
 import net.bettercombat.client.animation.AttackAnimationSubStack;
 import net.bettercombat.client.animation.CustomAnimationPlayer;
 import net.bettercombat.client.animation.PlayerAttackAnimatable;
@@ -39,6 +39,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -104,19 +105,19 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
 
 			if (isWeaponTwoHanded) {
 				if (mainHandAttributes.pose() != null) {
-					newMainHandPose = (KeyframeAnimation) AnimationRegistry.animations.get(mainHandAttributes.pose());
+					newMainHandPose = (KeyframeAnimation) PlayerAnimationRegistry.getAnimation(Identifier.of(mainHandAttributes.pose()));
 				}
 			} else if (isAlternativeTwoHandedWieldingActive) {
 				String two_handed_pose = ((DuckWeaponAttributesMixin) (Object) mainHandAttributes).bettercombatextension$getTwoHandedPose();
 				if (two_handed_pose != null) {
-					newMainHandPose = (KeyframeAnimation) AnimationRegistry.animations.get(two_handed_pose);
+					newMainHandPose = (KeyframeAnimation) PlayerAnimationRegistry.getAnimation(Identifier.of(two_handed_pose));
 				}
 			} else {
 				if (mainHandAttributes != null && mainHandAttributes.pose() != null) {
-					newMainHandPose = (KeyframeAnimation) AnimationRegistry.animations.get(mainHandAttributes.pose());
+					newMainHandPose = (KeyframeAnimation) PlayerAnimationRegistry.getAnimation(Identifier.of(mainHandAttributes.pose()));
 				}
 				if (offHandAttributes != null && offHandAttributes.offHandPose() != null) {
-					newOffHandPose = (KeyframeAnimation) AnimationRegistry.animations.get(offHandAttributes.offHandPose());
+					newOffHandPose = (KeyframeAnimation) PlayerAnimationRegistry.getAnimation(Identifier.of(offHandAttributes.offHandPose()));
 				}
 			}
 
@@ -134,7 +135,7 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
 
 	public void playAttackAnimation(String name, AnimatedHand animatedHand, float length, float upswing) {
 		try {
-			KeyframeAnimation animation = (KeyframeAnimation) AnimationRegistry.animations.get(name);
+			KeyframeAnimation animation = (KeyframeAnimation) PlayerAnimationRegistry.getAnimation(Identifier.of(name));
 			KeyframeAnimation.AnimationBuilder copy = animation.mutableCopy();
 			this.updateAnimationByCurrentActivity(copy);
 			copy.torso.fullyEnablePart(true);
@@ -146,8 +147,8 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
 			}
 
 			int fadeIn = copy.beginTick;
-			float upswingSpeed = speed / BetterCombat.config.getUpswingMultiplier();
-			float downwindSpeed = (float) ((double) speed * MathHelper.lerp(Math.max((double) BetterCombat.config.getUpswingMultiplier() - 0.5, 0.0) / 0.5, (double) (1.0F - upswing), (double) (upswing / (1.0F - upswing))));
+			float upswingSpeed = speed / BetterCombatMod.config.getUpswingMultiplier();
+			float downwindSpeed = (float) ((double) speed * MathHelper.lerp(Math.max((double) BetterCombatMod.config.getUpswingMultiplier() - 0.5, 0.0) / 0.5, (double) (1.0F - upswing), (double) (upswing / (1.0F - upswing))));
 			this.attackAnimation.speed.set(upswingSpeed, List.of(new TransmissionSpeedModifier.Gear(length * upswing, downwindSpeed), new TransmissionSpeedModifier.Gear(length, speed)));
 			this.attackAnimation.mirror.setEnabled(mirror);
 			CustomAnimationPlayer player = new CustomAnimationPlayer(copy.build(), 0);
@@ -210,6 +211,7 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
 
 	@Unique
 	private AdjustmentModifier createPoseAdjustment() {
+		PlayerEntity player = this;
 		return new HarshAdjustmentModifier((partName) -> {
 			float rotationX = 0.0F;
 			float rotationY = 0.0F;
@@ -221,7 +223,7 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
 				switch (partName) {
 					case "rightArm":
 					case "leftArm":
-						if (!this.mainHandItemPose.lastAnimationUsesBodyChannel && this.isSneaking()) {
+						if (!this.mainHandItemPose.lastAnimationUsesBodyChannel && player.isInSneakingPose()) {
 							offsetY += 3.0F;
 						}
 						break;
@@ -285,9 +287,9 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
 	@Unique
 	private FirstPersonConfiguration firstPersonConfig(AnimatedHand animatedHand) {
 		boolean showRightItem = true;
-		boolean showLeftItem = BetterCombatClient.config.isShowingOtherHandFirstPerson || animatedHand == AnimatedHand.TWO_HANDED;
-		boolean showRightArm = showRightItem && BetterCombatClient.config.isShowingArmsInFirstPerson;
-		boolean showLeftArm = showLeftItem && BetterCombatClient.config.isShowingArmsInFirstPerson;
+		boolean showLeftItem = BetterCombatClientMod.config.isShowingOtherHandFirstPerson || animatedHand == AnimatedHand.TWO_HANDED;
+		boolean showRightArm = showRightItem && BetterCombatClientMod.config.isShowingArmsInFirstPerson;
+		boolean showLeftArm = showLeftItem && BetterCombatClientMod.config.isShowingArmsInFirstPerson;
 		FirstPersonConfiguration config = new FirstPersonConfiguration(showRightArm, showLeftArm, showRightItem, showLeftItem);
 		return config;
 	}

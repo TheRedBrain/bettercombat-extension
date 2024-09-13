@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Optional;
 
 @Mixin(DamageSources.class)
+@SuppressWarnings("UnreachableCode")
 public abstract class DamageSourcesMixin {
 
 	@Inject(method = "playerAttack", at = @At("RETURN"), cancellable = true)
@@ -27,7 +28,7 @@ public abstract class DamageSourcesMixin {
 		AttackHand attackHand = ((EntityPlayer_BetterCombat) attacker).getCurrentAttack();
 		if (attackHand != null) {
 			String damageTypeString = ((DuckWeaponAttributesAttackMixin) (Object) attackHand.attack()).bettercombatextension$getDamageType();
-			if (damageTypeString != null && !damageTypeString.isEmpty() && Identifier.isValid(damageTypeString)) {
+			if (damageTypeString != null && !damageTypeString.isEmpty()) {
 				Identifier damageTypeId = Identifier.tryParse(damageTypeString);
 				if (damageTypeId != null) {
 					RegistryKey<DamageType> key = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, damageTypeId);
