@@ -1,3 +1,7 @@
+# 2.0.0
+
+- updated to 1.21.1
+
 # 1.3.0
 
 - added 'attack_pitch_range' config option
