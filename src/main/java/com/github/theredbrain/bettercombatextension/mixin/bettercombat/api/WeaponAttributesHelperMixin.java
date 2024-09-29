@@ -15,7 +15,7 @@ public class WeaponAttributesHelperMixin {
 
 	/**
 	 * @author TheRedBrain
-	 * @reason integrate two_handed_pose, stamina_cost_multiplier and damage_type
+	 * @reason integrate two_handed_pose, stamina_cost and damage_type
 	 */
 	@Overwrite(remap = false)
 	public static WeaponAttributes override(WeaponAttributes a, WeaponAttributes b) {
@@ -33,7 +33,7 @@ public class WeaponAttributesHelperMixin {
 			ArrayList<WeaponAttributes.Attack> overrideAttacks = new ArrayList();
 
 			WeaponAttributes.Attack base;
-			for (int i = 0; i < b.attacks().length; ++i) {
+			for (int i = 0; i < b.attacks().length; ++i) { // = new WeaponAttributes.Attack((WeaponAttributes.Condition[])null, (WeaponAttributes.HitBoxShape)null, 0.0, 0.0, 0.0, (String)null, (WeaponAttributes.Sound)null, (WeaponAttributes.Sound)null);
 				if (a.attacks() != null && a.attacks().length > i) {
 					base = a.attacks()[i];
 				} else {
@@ -47,15 +47,11 @@ public class WeaponAttributesHelperMixin {
 				String override_damageType = ((DuckWeaponAttributesAttackMixin) (Object) override).bettercombatextension$getDamageType();
 				if (!override_damageType.isEmpty()) {
 					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setDamageType(override_damageType);
-				} else {
-					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setDamageType(((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$getDamageType());
 				}
 
-				float override_staminaCostMultiplier = ((DuckWeaponAttributesAttackMixin) (Object) override).bettercombatextension$getStaminaCostMultiplier();
-				if (override_staminaCostMultiplier != 1.0F) {
-					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setStaminaCostMultiplier(override_staminaCostMultiplier);
-				} else {
-					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setStaminaCostMultiplier(((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$getStaminaCostMultiplier());
+				float override_staminaCost = ((DuckWeaponAttributesAttackMixin) (Object) override).bettercombatextension$getStaminaCostMultiplier();
+				if (override_staminaCost != 1.0F) {
+					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setStaminaCostMultiplier(override_staminaCost);
 				}
 
 				overrideAttacks.add(attack);
