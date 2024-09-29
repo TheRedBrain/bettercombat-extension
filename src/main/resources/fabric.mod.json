@@ -28,8 +28,8 @@
 		"bettercombatextension.mixins.json"
 	],
 	"depends": {
-		"minecraft": "${minecraft_version}",
-		"fabricloader": ">=${loader_version}",
+		"minecraft": ">=${minecraft_version_compat} <=${minecraft_version}",
+		"fabricloader": ">=${loader_version_compat}",
 		"fabric-api": "*",
 		"cloth-config": ">=${cloth_config_version}",
 		"bettercombat": ">=${better_combat_version}"
