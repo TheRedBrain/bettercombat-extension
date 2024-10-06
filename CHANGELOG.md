@@ -1,3 +1,8 @@
+# 2.1.0
+
+Added an experimental config option that solves an item duplication glitch when using "Better Combat" and "RPG Inventory" together. This fix is very experimental!
+Please report any issues you encounter when using this setting.
+
 # 2.0.1
 
 - fixed an issue where weapon_attributes would not inherit "damage_type" and "stamina_cost_multiplier" from their parent file

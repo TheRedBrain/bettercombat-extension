@@ -9,6 +9,17 @@ import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 )
 public class ServerConfig implements ConfigData {
 	@Comment("""
+			WARNING: EXPERIMENTAL
+			
+			Better Combats attacking with weapons in the offhand slot is incompatible with RPG Inventory
+			
+			Setting this option to true, fixes the incompatibility. This may have unexpected consequences.
+			Please report any issues you encounter when using this setting
+			
+			Default: false
+			""")
+	public boolean enable_experimental_swap_hand_attributes_algorithm = false;
+	@Comment("""
 			When set to true, changing the players orientation and position while attacking is disabled.
 			It is recommended to install Shoulder Surfing Reloaded, play in the third person perspective and activate the decoupled camera setting.
 			Since the movement_multiplier setting in the Better Combat server config has no effect when this is set to true, it is recommended to set it to its default of 1.0.

@@ -58,7 +58,18 @@ Each attack element has two new optional fields:
 	}
 }
 ```
+
 ## Server Config
+
+###  Better Combat x RPG Inventory Compatibility Experiment
+
+Setting the "enable_experimental_swap_hand_attributes_algorithm" setting in the server config to true, enables this experimental compatibility.
+This solves an item duplication glitch when using "Better Combat" and "RPG Inventory" together.
+
+> This fix is very experimental!
+>
+> Please report any issues you encounter when using this setting.
+
 ### Movement Locking Attacks
 
 Setting the "enable_movement_locking_attacks" setting in the server config to true, enables movement locking attacks.
