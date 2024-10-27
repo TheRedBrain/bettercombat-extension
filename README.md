@@ -109,6 +109,10 @@ If the offhand slot is empty, the idle pose defined via the "two_handed_pose" fi
 
 This is designed to work together with the mod [RPG Inventory](https://modrinth.com/mod/rpg-inventory).
 
+### Sprinting disables weapon poses
+
+Enabled when "enable_poses_while_sprinting" setting in server config is false.
+
 ### Skipping attacks with feinting
 
 Enabled when "feinting_increases_combo_count" setting in server config is true.

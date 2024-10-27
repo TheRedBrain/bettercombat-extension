@@ -1,3 +1,8 @@
+# 2.3.0
+
+- fixed a crash on game start
+- added 'enable_poses_while_sprinting' config option
+
 # 2.2.0
 
 - added 'use_entity_interaction_range_attribute_as_attack_range' config option
