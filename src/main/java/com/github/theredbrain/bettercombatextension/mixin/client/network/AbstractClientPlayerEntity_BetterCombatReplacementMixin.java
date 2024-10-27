@@ -90,7 +90,7 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
 		boolean hasActiveAttackAnimation = this.attackAnimation.base.getAnimation() != null && this.attackAnimation.base.getAnimation().isActive();
 		ItemStack mainHandStack = player.getMainHandStack();
 		ItemStack offHandStack = player.getOffHandStack();
-		if (!player.handSwinging && !player.isSwimming() && !player.isUsingItem() && !Platform.isCastingSpell(player) && !CrossbowItem.isCharged(mainHandStack)) {
+		if (!player.handSwinging && !player.isSwimming() && !player.isUsingItem() && (BetterCombatExtension.serverConfig.enable_poses_while_sprinting || !player.isSprinting()) && !player.isClimbing() && !player.isFallFlying() && !Platform.isCastingSpell(player) && !CrossbowItem.isCharged(mainHandStack)) {
 			if (hasActiveAttackAnimation) {
 				((LivingEntityAccessor) player).invokeTurnHead(player.getHeadYaw(), 0.0F);
 			}

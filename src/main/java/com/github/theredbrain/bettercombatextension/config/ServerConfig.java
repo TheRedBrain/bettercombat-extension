@@ -78,6 +78,12 @@ public class ServerConfig implements ConfigData {
 			""")
 	public boolean use_entity_interaction_range_attribute_as_attack_range = false;
 	@Comment("""
+			When set to false, weapon poses are not displayed while the player is sprinting.
+			
+			Default: true
+			""")
+	public boolean enable_poses_while_sprinting = true;
+	@Comment("""
 			
 			
 			The stamina cost of all attacks is multiplied with this value when the attack is feinted.
