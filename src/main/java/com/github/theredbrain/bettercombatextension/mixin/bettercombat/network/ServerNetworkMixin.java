@@ -45,7 +45,7 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(ServerNetwork.class)
 public class ServerNetworkMixin {
 
-	@Shadow
+	@Shadow(remap = false)
 	@Final
 	static Logger LOGGER;
 
