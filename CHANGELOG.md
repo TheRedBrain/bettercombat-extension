@@ -1,3 +1,7 @@
+# 2.2.0
+
+- added 'use_entity_interaction_range_attribute_as_attack_range' config option
+
 # 2.1.0
 
 Added an experimental config option that solves an item duplication glitch when using "Better Combat" and "RPG Inventory" together. This fix is very experimental!

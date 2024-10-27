@@ -10,6 +10,7 @@ import com.github.theredbrain.staminaattributes.entity.StaminaUsingEntity;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import me.shedaniel.autoconfig.serializer.PartitioningSerializer;
+import net.bettercombat.api.WeaponAttributes;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -18,6 +19,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -48,6 +51,14 @@ public class BetterCombatExtension implements ModInitializer {
 	public static void addStamina(LivingEntity livingEntity, float amount) {
 		if (isStaminaAttributesLoaded) {
 			((StaminaUsingEntity) livingEntity).staminaattributes$addStamina(amount);
+		}
+	}
+
+	public static double getAttackRange(PlayerEntity playerEntity, WeaponAttributes weaponAttributes) {
+		if (BetterCombatExtension.serverConfig.use_entity_interaction_range_attribute_as_attack_range) {
+			return playerEntity.getAttributeValue(EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE);
+		} else {
+			return weaponAttributes.attackRange();
 		}
 	}
 

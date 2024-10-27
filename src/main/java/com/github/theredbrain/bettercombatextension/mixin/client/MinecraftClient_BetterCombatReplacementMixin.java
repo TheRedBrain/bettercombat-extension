@@ -317,7 +317,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 			WeaponAttributes attributes = WeaponRegistry.getAttributes(this.player.getMainHandStack());
 			List<Entity> targets = List.of();
 			if (attributes != null && attributes.attacks() != null) {
-				targets = TargetFinder.findAttackTargets(this.player, this.getCursorTarget(), hand.attack(), attributes.attackRange());
+				targets = TargetFinder.findAttackTargets(this.player, this.getCursorTarget(), hand.attack(), BetterCombatExtension.getAttackRange(this.player, attributes));
 			}
 
 			this.updateTargetsInReach(targets);
@@ -380,7 +380,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 					double upswingRate = hand.upswingRate();
 					if (!((double) this.player.getAttackCooldownProgress(0.0F) < 1.0 - upswingRate)) {
 						Entity cursorTarget = this.getCursorTarget();
-						List<Entity> targets = TargetFinder.findAttackTargets(this.player, cursorTarget, attack, hand.attributes().attackRange());
+						List<Entity> targets = TargetFinder.findAttackTargets(this.player, cursorTarget, attack, BetterCombatExtension.getAttackRange(this.player, hand.attributes()));
 						this.updateTargetsInReach(targets);
 						if (targets.size() == 0) {
 							PlatformClient.onEmptyLeftClick(this.player);

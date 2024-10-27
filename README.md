@@ -91,6 +91,10 @@ This affects the animation and the attack hitbox.
 
 While attacking with items in the item tag "bettercombatextension:tags/items/ignores_attack_movement_penalty" the multiplier is not applied.
 
+### Attacks use "minecraft:player.entity_interaction_range" entity attribute instead of "attack_range" value in weapon_attribute file
+
+Enabled when "use_entity_interaction_range_attribute_as_attack_range" setting in server config is true.
+
 ### Disabling Better Combats "Hold to attack" client setting
 
 Enabled when "disable_better_combat_hold_to_attack" setting in server config is true.
