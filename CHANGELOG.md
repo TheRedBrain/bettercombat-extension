@@ -1,3 +1,10 @@
+# 2.4.0
+
+- added support for Better Combat version 2.0.4
+- moved 'enable_poses_while_sprinting' from server to client config
+- removed dependency on Cloth Config
+- added dependency on Fzzy Config
+
 # 2.3.0
 
 - fixed a crash on game start

@@ -38,7 +38,7 @@ public abstract class PlayerAttackHelperMixin {
 	@Overwrite
 	public static boolean isTwoHandedWielding(PlayerEntity player) {
 		WeaponAttributes mainAttributes = WeaponRegistry.getAttributes(player.getMainHandStack());
-		return (mainAttributes != null && mainAttributes.isTwoHanded()) || (player.getOffHandStack().isEmpty() && BetterCombatExtension.serverConfig.empty_offhand_equals_two_handing_mainhand);
+		return (mainAttributes != null && mainAttributes.isTwoHanded()) || (player.getOffHandStack().isEmpty() && BetterCombatExtension.SERVER_CONFIG.empty_offhand_equals_two_handing_mainhand.get());
 	}
 
 	/**
@@ -55,7 +55,7 @@ public abstract class PlayerAttackHelperMixin {
 				ItemStack mainHandStack = player.getMainHandStack();
 				ItemStack offHandStack = player.getOffHandStack();
 				setAttributesForOffHandAttack(player, true);
-				if (BetterCombatExtension.serverConfig.enable_experimental_swap_hand_attributes_algorithm) {
+				if (BetterCombatExtension.SERVER_CONFIG.enable_experimental_swap_hand_attributes_algorithm.get()) {
 					player.equipStack(EquipmentSlot.MAINHAND, offHandStack);
 					player.equipStack(EquipmentSlot.OFFHAND, offHandStack);
 				} else {
@@ -63,7 +63,7 @@ public abstract class PlayerAttackHelperMixin {
 					inventory.offHand.set(0, offHandStack);
 				}
 				runnable.run();
-				if (BetterCombatExtension.serverConfig.enable_experimental_swap_hand_attributes_algorithm) {
+				if (BetterCombatExtension.SERVER_CONFIG.enable_experimental_swap_hand_attributes_algorithm.get()) {
 					player.equipStack(EquipmentSlot.MAINHAND, mainHandStack);
 					player.equipStack(EquipmentSlot.OFFHAND, offHandStack);
 				} else {

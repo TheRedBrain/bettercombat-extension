@@ -83,9 +83,9 @@ public abstract class ClientPlayerEntityMixin_BetterCombatReplacementMixin exten
 				}
 			}
 		}
-		var betterCombatExtensionServerConfig = BetterCombatExtension.serverConfig;
+		var betterCombatExtensionServerConfig = BetterCombatExtension.SERVER_CONFIG;
 		boolean isMovementLockingDisabled = activeItemStack.isIn(BetterCombatExtension.DISABLES_MOVEMENT_LOCKING_DURING_ATTACK);
-		if (betterCombatExtensionServerConfig.enable_movement_locking_attacks && !isMovementLockingDisabled && isWeaponSwingInProgress) {
+		if (betterCombatExtensionServerConfig.enable_movement_locking_attacks.get() && !isMovementLockingDisabled && isWeaponSwingInProgress) {
 			boolean isVehicleDisablingMovementLocking = clientPlayer.getVehicle() != null && clientPlayer.getVehicle().getType().isIn(BetterCombatExtension.DISABLES_MOVEMENT_LOCKING_WHEN_RIDDEN);
 			if (!clientPlayer.hasVehicle() || !isVehicleDisablingMovementLocking) {
 				Input var10000 = clientPlayer.input;
@@ -95,7 +95,7 @@ public abstract class ClientPlayerEntityMixin_BetterCombatReplacementMixin exten
 			}
 		}
 		boolean isJumpRestrictionDisabled = activeItemStack.isIn(BetterCombatExtension.DISABLES_JUMP_RESTRICTION_DURING_ATTACK);
-		if (betterCombatExtensionServerConfig.enable_jump_restriction_during_attacks && !isJumpRestrictionDisabled && isWeaponSwingInProgress) {
+		if (betterCombatExtensionServerConfig.enable_jump_restriction_during_attacks.get() && !isJumpRestrictionDisabled && isWeaponSwingInProgress) {
 			boolean isVehicleDisablingJumpRestriction = clientPlayer.getVehicle() != null && clientPlayer.getVehicle().getType().isIn(BetterCombatExtension.DISABLES_JUMP_RESTRICTION_WHEN_RIDDEN);
 			if (!clientPlayer.hasVehicle() || !isVehicleDisablingJumpRestriction) {
 				Input var10000 = clientPlayer.input;

@@ -1,19 +1,15 @@
 package com.github.theredbrain.bettercombatextension;
 
 import com.github.theredbrain.bettercombatextension.config.ServerConfig;
-import com.github.theredbrain.bettercombatextension.config.ServerConfigWrapper;
 import com.github.theredbrain.bettercombatextension.network.packet.AttackStaminaCostPacket;
 import com.github.theredbrain.bettercombatextension.network.packet.AttackStaminaCostPacketReceiver;
 import com.github.theredbrain.bettercombatextension.network.packet.CancelAttackPacket;
-import com.github.theredbrain.bettercombatextension.network.packet.ServerConfigSyncPacket;
 import com.github.theredbrain.staminaattributes.entity.StaminaUsingEntity;
-import me.shedaniel.autoconfig.AutoConfig;
-import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
-import me.shedaniel.autoconfig.serializer.PartitioningSerializer;
+import me.fzzyhmstrs.fzzy_config.api.ConfigApiJava;
+import me.fzzyhmstrs.fzzy_config.api.RegisterType;
 import net.bettercombat.api.WeaponAttributes;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.EntityType;
@@ -32,7 +28,7 @@ import org.slf4j.LoggerFactory;
 public class BetterCombatExtension implements ModInitializer {
 	public static final String MOD_ID = "bettercombatextension";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	public static ServerConfig serverConfig;
+	public static ServerConfig SERVER_CONFIG = ConfigApiJava.registerAndLoadConfig(ServerConfig::new, RegisterType.BOTH);
 
 	public static final boolean isShoulderSurfingLoaded = FabricLoader.getInstance().isModLoaded("shouldersurfing");
 
@@ -55,7 +51,7 @@ public class BetterCombatExtension implements ModInitializer {
 	}
 
 	public static double getAttackRange(PlayerEntity playerEntity, WeaponAttributes weaponAttributes) {
-		if (BetterCombatExtension.serverConfig.use_entity_interaction_range_attribute_as_attack_range) {
+		if (BetterCombatExtension.SERVER_CONFIG.use_entity_interaction_range_attribute_as_attack_range.get()) {
 			return playerEntity.getAttributeValue(EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE);
 		} else {
 			return weaponAttributes.attackRange();
@@ -66,18 +62,10 @@ public class BetterCombatExtension implements ModInitializer {
 	public void onInitialize() {
 		LOGGER.info("BetterCombat was extended!");
 
-		AutoConfig.register(ServerConfigWrapper.class, PartitioningSerializer.wrap(JanksonConfigSerializer::new));
-		serverConfig = ((ServerConfigWrapper) AutoConfig.getConfigHolder(ServerConfigWrapper.class).getConfig()).server;
-
 		PayloadTypeRegistry.playS2C().register(CancelAttackPacket.PACKET_ID, CancelAttackPacket.PACKET_CODEC);
 
 		PayloadTypeRegistry.playC2S().register(AttackStaminaCostPacket.PACKET_ID, AttackStaminaCostPacket.PACKET_CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(AttackStaminaCostPacket.PACKET_ID, new AttackStaminaCostPacketReceiver());
-
-		PayloadTypeRegistry.playS2C().register(ServerConfigSyncPacket.PACKET_ID, ServerConfigSyncPacket.PACKET_CODEC);
-		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			ServerPlayNetworking.send(handler.player, new ServerConfigSyncPacket(serverConfig));
-		});
 
 	}
 

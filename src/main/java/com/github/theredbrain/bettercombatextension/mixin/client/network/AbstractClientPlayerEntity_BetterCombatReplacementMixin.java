@@ -1,6 +1,7 @@
 package com.github.theredbrain.bettercombatextension.mixin.client.network;
 
 import com.github.theredbrain.bettercombatextension.BetterCombatExtension;
+import com.github.theredbrain.bettercombatextension.BetterCombatExtensionClient;
 import com.github.theredbrain.bettercombatextension.bettercombat.DuckWeaponAttributesMixin;
 import com.github.theredbrain.bettercombatextension.config.ServerConfig;
 import com.mojang.authlib.GameProfile;
@@ -28,7 +29,7 @@ import net.bettercombat.client.animation.PoseSubStack;
 import net.bettercombat.client.animation.StateCollectionHelper;
 import net.bettercombat.client.animation.modifier.HarshAdjustmentModifier;
 import net.bettercombat.client.animation.modifier.TransmissionSpeedModifier;
-import net.bettercombat.compatibility.CompatibilityFlags;
+import net.bettercombat.client.compat.FirstPersonAnimationCompatibility;
 import net.bettercombat.logic.AnimatedHand;
 import net.bettercombat.logic.WeaponRegistry;
 import net.bettercombat.mixin.LivingEntityAccessor;
@@ -90,7 +91,7 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
 		boolean hasActiveAttackAnimation = this.attackAnimation.base.getAnimation() != null && this.attackAnimation.base.getAnimation().isActive();
 		ItemStack mainHandStack = player.getMainHandStack();
 		ItemStack offHandStack = player.getOffHandStack();
-		if (!player.handSwinging && !player.isSwimming() && !player.isUsingItem() && (BetterCombatExtension.serverConfig.enable_poses_while_sprinting || !player.isSprinting()) && !player.isClimbing() && !player.isFallFlying() && !Platform.isCastingSpell(player) && !CrossbowItem.isCharged(mainHandStack)) {
+		if (!player.handSwinging && !player.isSwimming() && !player.isUsingItem() && (BetterCombatExtensionClient.CLIENT_CONFIG.enable_poses_while_sprinting.get() || !player.isSprinting()) && !player.isClimbing() && !player.isFallFlying() && !Platform.isCastingSpell(player) && !CrossbowItem.isCharged(mainHandStack)) {
 			if (hasActiveAttackAnimation) {
 				((LivingEntityAccessor) player).invokeTurnHead(player.getHeadYaw(), 0.0F);
 			}
@@ -101,7 +102,7 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
 			WeaponAttributes offHandAttributes = WeaponRegistry.getAttributes(player.getOffHandStack());
 
 			boolean isWeaponTwoHanded = mainHandAttributes != null && mainHandAttributes.isTwoHanded();
-			boolean isAlternativeTwoHandedWieldingActive = mainHandAttributes != null && !mainHandAttributes.isTwoHanded() && offHandStack.isEmpty() && BetterCombatExtension.serverConfig.empty_offhand_equals_two_handing_mainhand;
+			boolean isAlternativeTwoHandedWieldingActive = mainHandAttributes != null && !mainHandAttributes.isTwoHanded() && offHandStack.isEmpty() && BetterCombatExtension.SERVER_CONFIG.empty_offhand_equals_two_handing_mainhand.get();
 
 			if (isWeaponTwoHanded) {
 				if (mainHandAttributes.pose() != null) {
@@ -152,7 +153,7 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
 			this.attackAnimation.speed.set(upswingSpeed, List.of(new TransmissionSpeedModifier.Gear(length * upswing, downwindSpeed), new TransmissionSpeedModifier.Gear(length, speed)));
 			this.attackAnimation.mirror.setEnabled(mirror);
 			CustomAnimationPlayer player = new CustomAnimationPlayer(copy.build(), 0);
-			player.setFirstPersonMode(CompatibilityFlags.firstPersonRender() ? FirstPersonMode.THIRD_PERSON_MODEL : FirstPersonMode.NONE);
+			player.setFirstPersonMode(FirstPersonAnimationCompatibility.firstPersonMode());
 			player.setFirstPersonConfiguration(this.firstPersonConfig(animatedHand));
 			this.attackAnimation.base.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(fadeIn, Ease.INOUTSINE), player);
 		} catch (Exception var13) {
@@ -171,8 +172,8 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
 			float offsetY = 0.0F;
 			float offsetZ = 0.0F;
 			float pitch;
-			ServerConfig serverConfig = BetterCombatExtension.serverConfig;
-			pitch = serverConfig.restrict_attack_pitch ? MathHelper.clamp(this.getPitch(), -serverConfig.attack_pitch_range, serverConfig.attack_pitch_range) : this.getPitch();
+			ServerConfig serverConfig = BetterCombatExtension.SERVER_CONFIG;
+			pitch = serverConfig.restrict_attack_pitch.get() ? MathHelper.clamp(this.getPitch(), -serverConfig.attack_pitch_range.get(), serverConfig.attack_pitch_range.get()) : this.getPitch();
 			pitch = (float) Math.toRadians((double) pitch);
 			if (FirstPersonMode.isFirstPersonPass()) {
 				switch (partName) {
