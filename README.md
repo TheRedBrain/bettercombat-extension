@@ -5,54 +5,26 @@ It adds several new features and settings which are all controlled from the serv
 
 ## Additions to weapon_attribute files
 
-In addition to the existing fields 'pose' and 'offhand_pose' there is an optional String field called 'two_handed_pose'.
+'two_handed_pose', this has no effect when the 'two_handed' field is set to true
 
 Each attack element has two new optional fields:
-- an int field called 'stamina_cost_multiplier'
-- a String field called 'damage_type', when this is a valid identifier for a damage type, the attack deals damage using that damage type
+- 'stamina_cost_multiplier', multiplies the stamina cost set by the 'attack_stamina_cost' attribute
+- 'damage_type': when this is a valid identifier for a damage type, the attack deals damage using that damage type
 
 ### Example
+
+This is an example weapon_attribute file where all added values are present (with their default values)
+
+> Note that this is not a valid weapon_attribute file, as several fields added by Better Combat are not present.
 
 ```json
 {
 	"attributes": {
-		"attack_range": 2.5,
-		"category": "sword",
-		"two_handed_pose": "bettercombat:pose_two_handed_sword",
+		"two_handed_pose": "",
 		"attacks": [
 			{
-				"hitbox": "HORIZONTAL_PLANE",
-				"damage_multiplier": 1,
-				"stamina_cost_multiplier": 1,
-				"angle": 120,
-				"upswing": 0.5,
-				"animation": "bettercombat:one_handed_slash_horizontal_right",
-				"swing_sound": {
-					"id": "bettercombat:sword_slash"
-				}
-			},
-			{
-				"hitbox": "HORIZONTAL_PLANE",
-				"damage_multiplier": 1,
-				"stamina_cost_multiplier": 1,
-				"angle": 120,
-				"upswing": 0.5,
-				"animation": "bettercombat:one_handed_slash_horizontal_left",
-				"swing_sound": {
-					"id": "bettercombat:sword_slash"
-				}
-			},
-			{
-				"hitbox": "FORWARD_BOX",
-				"damage_multiplier": 1,
-				"stamina_cost_multiplier": 1.1,
-				"angle": 0,
-				"upswing": 0.5,
-				"animation": "bettercombat:one_handed_stab",
-				"swing_sound": {
-					"id": "bettercombat:sword_slash",
-					"pitch": 1.2
-				}
+				"stamina_cost_multiplier": 1.0,
+				"damage_type": ""
 			}
 		]
 	}
