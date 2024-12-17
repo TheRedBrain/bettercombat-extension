@@ -53,6 +53,14 @@ The item tag "bettercombatextension:tags/items/disables_movement_locking_during_
 
 Note that Better Combats "movement_speed_while_attacking" movement speed multiplier has no effect while this option is enabled.
 
+### No Jumping During Attacks
+
+Enabled when "enable_jump_restriction_during_attacks" setting in server config is true.
+
+Disables jumping while an attack animation is active.
+
+The item tag "bettercombatextension:tags/items/disables_jump_restriction_during_attack" and the entity type tag "bettercombatextension:tags/entity_types/disables_jump_restriction_when_ridden" are used to control when the jump restriction is applied.
+
 ### Restricting attack pitch
 
 Setting the "restrict_attack_pitch" setting in the server config to true, restricts the attack pitch to a range defined by the "attack_pitch_range" server config setting.
@@ -83,7 +91,7 @@ This is designed to work together with the mod [RPG Inventory](https://modrinth.
 
 ### Sprinting disables weapon poses
 
-Enabled when "enable_poses_while_sprinting" setting in server config is false.
+Enabled when "enable_poses_while_sprinting" setting in client config is false.
 
 ### Skipping attacks with feinting
 
