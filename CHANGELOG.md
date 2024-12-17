@@ -1,3 +1,10 @@
+# 1.4.0
+
+- removed dependency on Cloth Config
+- added dependency on Fzzy Config
+- added 'enable_poses_while_sprinting' client config option
+- fixed an issue where weapon_attributes would not inherit "damage_type" and "stamina_cost_multiplier" from their parent file
+
 # 1.3.0
 
 - added 'attack_pitch_range' config option

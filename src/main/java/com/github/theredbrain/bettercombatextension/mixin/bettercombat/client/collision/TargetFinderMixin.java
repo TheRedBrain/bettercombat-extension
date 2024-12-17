@@ -40,8 +40,8 @@ public abstract class TargetFinderMixin {
 
 		boolean isSpinAttack = attack.angle() > 180.0;
 		Vec3d size = WeaponHitBoxes.createHitbox(attack.hitbox(), attackRange, isSpinAttack);
-		ServerConfig serverConfig = BetterCombatExtension.serverConfig;
-		float attackPitch = serverConfig.restrict_attack_pitch ? MathHelper.clamp(player.getPitch(), -serverConfig.attack_pitch_range, serverConfig.attack_pitch_range) : player.getPitch();
+		ServerConfig serverConfig = BetterCombatExtension.SERVER_CONFIG;
+		float attackPitch = serverConfig.restrict_attack_pitch.get() ? MathHelper.clamp(player.getPitch(), -serverConfig.attack_pitch_range.get(), serverConfig.attack_pitch_range.get()) : player.getPitch();
 		OrientedBoundingBox obb = new OrientedBoundingBox(origin, size, attackPitch, player.getYaw());
 		if (!isSpinAttack) {
 			obb = obb.offsetAlongAxisZ(size.z / 2.0);

@@ -199,7 +199,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 					ci.cancel();
 				}
 
-				if (BetterCombatClient.config.isHoldToAttackEnabled && !BetterCombatExtension.serverConfig.disable_better_combat_hold_to_attack && isPressed) {
+				if (BetterCombatClient.config.isHoldToAttackEnabled && !BetterCombatExtension.SERVER_CONFIG.disable_better_combat_hold_to_attack.get() && isPressed) {
 					this.isHoldingAttackInput = true;
 					this.startUpswing(attributes);
 					ci.cancel();
@@ -415,17 +415,17 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 
 	@Unique
 	private void performAttack() {
-		ServerConfig serverConfig = BetterCombatExtension.serverConfig;
+		ServerConfig serverConfig = BetterCombatExtension.SERVER_CONFIG;
 		if (this.player != null) {
 			if (BetterCombatKeybindings.feintKeyBinding.isPressed()) {
 				this.player.resetLastAttackedTicks();
 				this.cancelWeaponSwing();
 				// feinting an attack increases combo count
-				if (serverConfig.feinting_increases_combo_count) {
+				if (serverConfig.feinting_increases_combo_count.get()) {
 					this.setComboCount(this.getComboCount() + 1);
 					AttackHand hand = this.getCurrentHand();
 					if (hand != null && BetterCombatExtension.isStaminaAttributesLoaded) {
-						ClientPlayNetworking.send(new AttackStaminaCostPacket(((DuckLivingEntityMixin) this.player).bettercombatextension$getAttackStaminaCost() * ((DuckWeaponAttributesAttackMixin) (Object) hand.attack()).bettercombatextension$getStaminaCostMultiplier() * serverConfig.global_feint_stamina_cost_multiplier));
+						ClientPlayNetworking.send(new AttackStaminaCostPacket(((DuckLivingEntityMixin) this.player).bettercombatextension$getAttackStaminaCost() * ((DuckWeaponAttributesAttackMixin) (Object) hand.attack()).bettercombatextension$getStaminaCostMultiplier() * serverConfig.global_feint_stamina_cost_multiplier.get()));
 					}
 				}
 			} else {
@@ -433,7 +433,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 				if (hand != null) {
 					WeaponAttributes.Attack attack = hand.attack();
 					if (BetterCombatExtension.isStaminaAttributesLoaded) {
-						ClientPlayNetworking.send(new AttackStaminaCostPacket(((DuckLivingEntityMixin) this.player).bettercombatextension$getAttackStaminaCost() * ((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$getStaminaCostMultiplier() * serverConfig.global_attack_stamina_cost_multiplier));
+						ClientPlayNetworking.send(new AttackStaminaCostPacket(((DuckLivingEntityMixin) this.player).bettercombatextension$getAttackStaminaCost() * ((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$getStaminaCostMultiplier() * serverConfig.global_attack_stamina_cost_multiplier.get()));
 					}
 					double upswingRate = hand.upswingRate();
 					if (!((double) this.player.getAttackCooldownProgress(0.0F) < 1.0 - upswingRate)) {

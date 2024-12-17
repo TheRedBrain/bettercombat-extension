@@ -28,6 +28,6 @@ public class PlayerAttackHelperMixin {
 	@Overwrite
 	public static boolean isTwoHandedWielding(PlayerEntity player) {
 		WeaponAttributes mainAttributes = WeaponRegistry.getAttributes(player.getMainHandStack());
-		return (mainAttributes != null && mainAttributes.isTwoHanded()) || (player.getOffHandStack().isEmpty() && BetterCombatExtension.serverConfig.empty_offhand_equals_two_handing_mainhand);
+		return (mainAttributes != null && mainAttributes.isTwoHanded()) || (player.getOffHandStack().isEmpty() && BetterCombatExtension.SERVER_CONFIG.empty_offhand_equals_two_handing_mainhand.get());
 	}
 }
