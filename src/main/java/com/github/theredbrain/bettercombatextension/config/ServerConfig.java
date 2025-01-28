@@ -73,14 +73,6 @@ public class ServerConfig extends Config {
 			""")
 	public ValidatedBoolean feinting_increases_combo_count = new ValidatedBoolean(false);
 	@Comment("""
-			When set to true, the "minecraft:player.entity_interaction_range" entity attribute is used to determine the attack range.
-			It is recommended to set the "isTooltipAttackRangeEnabled" value in the Better Combat client config to false,
-			as it no longer displays the correct value.
-			
-			Default: false
-			""")
-	public ValidatedBoolean use_entity_interaction_range_attribute_as_attack_range = new ValidatedBoolean(false);
-	@Comment("""
 			
 			
 			The stamina cost of all attacks is multiplied with this value when the attack is feinted.

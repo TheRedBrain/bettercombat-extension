@@ -2,6 +2,7 @@
 
 - re-added compat with 1.21
 - added support for Better Combat version 2.1.3
+- removed 'use_entity_interaction_range_attribute_as_attack_range' config option. This feature was implemented in Better Combat.
 
 # 2.4.0
 
