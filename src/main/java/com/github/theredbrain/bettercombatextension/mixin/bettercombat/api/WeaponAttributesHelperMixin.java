@@ -20,6 +20,7 @@ public class WeaponAttributesHelperMixin {
 	@Overwrite(remap = false)
 	public static WeaponAttributes override(WeaponAttributes a, WeaponAttributes b) {
 		double attackRange = b.attackRange() > 0.0 ? b.attackRange() : a.attackRange();
+		double rangeBonus = b.rangeBonus() != 0.0 ? b.rangeBonus() : a.rangeBonus();
 		String pose = b.pose() != null ? b.pose() : a.pose();
 		String off_hand_pose = b.offHandPose() != null ? b.offHandPose() : a.offHandPose();
 
@@ -64,7 +65,7 @@ public class WeaponAttributesHelperMixin {
 			attacks = (WeaponAttributes.Attack[]) overrideAttacks.toArray(new WeaponAttributes.Attack[0]);
 		}
 
-		WeaponAttributes newWeaponAttributes = new WeaponAttributes(attackRange, pose, off_hand_pose, isTwoHanded, category, attacks);
+		WeaponAttributes newWeaponAttributes = new WeaponAttributes(attackRange, rangeBonus, pose, off_hand_pose, isTwoHanded, category, attacks);
 		((DuckWeaponAttributesMixin) (Object) newWeaponAttributes).bettercombatextension$setTwoHandedPose(two_handed_pose);
 		return newWeaponAttributes;
 	}

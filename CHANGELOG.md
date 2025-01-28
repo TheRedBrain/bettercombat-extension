@@ -1,6 +1,7 @@
 # 2.5.0
 
 - re-added compat with 1.21
+- added support for Better Combat version 2.1.3
 
 # 2.4.0
 

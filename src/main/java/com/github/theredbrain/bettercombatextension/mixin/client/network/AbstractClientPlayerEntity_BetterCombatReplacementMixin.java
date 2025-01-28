@@ -32,7 +32,7 @@ import net.bettercombat.client.animation.modifier.TransmissionSpeedModifier;
 import net.bettercombat.client.compat.FirstPersonAnimationCompatibility;
 import net.bettercombat.logic.AnimatedHand;
 import net.bettercombat.logic.WeaponRegistry;
-import net.bettercombat.mixin.LivingEntityAccessor;
+import net.bettercombat.mixin.player.LivingEntityAccessor;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.EntityPose;

@@ -10,7 +10,6 @@ public class BetterCombatExtensionMixinCanceller implements MixinCanceller {
 		return switch (mixinClassName) {
 			case "net.bettercombat.mixin.client.AbstractClientPlayerEntityMixin",
 				 "net.bettercombat.mixin.client.ClientPlayerEntityMixin",
-				 "net.bettercombat.mixin.client.ColliderDebugRenderer",
 				 "net.bettercombat.mixin.client.MinecraftClientInject" -> true;
 			default -> false;
 		};

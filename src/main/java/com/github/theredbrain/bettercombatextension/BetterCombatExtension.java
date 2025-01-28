@@ -50,14 +50,6 @@ public class BetterCombatExtension implements ModInitializer {
 		}
 	}
 
-	public static double getAttackRange(PlayerEntity playerEntity, WeaponAttributes weaponAttributes) {
-		if (BetterCombatExtension.SERVER_CONFIG.use_entity_interaction_range_attribute_as_attack_range.get()) {
-			return playerEntity.getAttributeValue(EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE);
-		} else {
-			return weaponAttributes.attackRange();
-		}
-	}
-
 	@Override
 	public void onInitialize() {
 		LOGGER.info("BetterCombat was extended!");

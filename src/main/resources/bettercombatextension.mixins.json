@@ -8,7 +8,6 @@
     "bettercombat.api.WeaponAttributesHelperMixin",
     "bettercombat.api.WeaponAttributesMixin",
     "bettercombat.client.collision.TargetFinderMixin",
-    "bettercombat.network.ServerNetworkMixin",
     "entity.LivingEntityMixin",
     "entity.attribute.EntityAttributesMixin",
     "entity.damage.DamageSourcesMixin"
@@ -20,7 +19,6 @@
     "client.MinecraftClient_BetterCombatReplacementMixin",
     "client.MouseMixin",
     "client.network.AbstractClientPlayerEntity_BetterCombatReplacementMixin",
-    "client.network.ClientPlayerEntityMixin_BetterCombatReplacementMixin",
-    "client.render.debug.DebugRenderer_BetterCombatReplacementMixin"
+    "client.network.ClientPlayerEntityMixin_BetterCombatReplacementMixin"
   ]
 }

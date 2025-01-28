@@ -29,6 +29,7 @@ import net.bettercombat.utils.PatternMatching;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -64,8 +65,15 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	@Shadow
 	private int itemUseCooldown;
 	@Shadow
+	@Final
+	public TextRenderer textRenderer;
+	@Shadow
 	public int attackCooldown;
-	@Shadow @Final public InGameHud inGameHud;
+	@Shadow
+	@Final
+	public InGameHud inGameHud;
+	@Shadow
+	public @Nullable HitResult crosshairTarget;
 	@Unique
 	private boolean isHoldingAttackInput = false;
 	@Unique
@@ -313,11 +321,14 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	@Unique
 	private void updateTargetsIfNeeded() {
 		if (this.shouldUpdateTargetsInReach()) {
-			AttackHand hand = PlayerAttackHelper.getCurrentAttack(this.player, this.getComboCount());
-			WeaponAttributes attributes = WeaponRegistry.getAttributes(this.player.getMainHandStack());
 			List<Entity> targets = List.of();
-			if (attributes != null && attributes.attacks() != null) {
-				targets = TargetFinder.findAttackTargets(this.player, this.getCursorTarget(), hand.attack(), BetterCombatExtension.getAttackRange(this.player, attributes));
+			AttackHand hand = PlayerAttackHelper.getCurrentAttack(this.player, this.getComboCount());
+			if (hand != null) {
+				WeaponAttributes attributes = WeaponRegistry.getAttributes(hand.itemStack());
+				double range = PlayerAttackHelper.getRangeForItem(this.player, hand.itemStack());
+				if (attributes != null && attributes.attacks() != null) {
+					targets = TargetFinder.findAttackTargets(this.player, this.getCursorTarget(), hand.attack(), range);
+				}
 			}
 
 			this.updateTargetsInReach(targets);
@@ -380,10 +391,17 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 					double upswingRate = hand.upswingRate();
 					if (!((double) this.player.getAttackCooldownProgress(0.0F) < 1.0 - upswingRate)) {
 						Entity cursorTarget = this.getCursorTarget();
-						List<Entity> targets = TargetFinder.findAttackTargets(this.player, cursorTarget, attack, BetterCombatExtension.getAttackRange(this.player, hand.attributes()));
+						double range = PlayerAttackHelper.getRangeForItem(this.player, hand.itemStack());
+						List<Entity> targets = TargetFinder.findAttackTargets(this.player, cursorTarget, attack, range);
 						this.updateTargetsInReach(targets);
 						if (targets.size() == 0) {
 							PlatformClient.onEmptyLeftClick(this.player);
+							if (this.crosshairTarget.getType() == HitResult.Type.BLOCK) {
+								BlockHitResult blockHitResult = (BlockHitResult)this.crosshairTarget;
+								BlockPos pos = blockHitResult.getBlockPos();
+								Packets.C2S_BlockHit packet = new Packets.C2S_BlockHit(pos);
+								Platform.networkC2S_Send(packet);
+							}
 						}
 
 						Packets.C2S_AttackRequest packet = new Packets.C2S_AttackRequest(this.getComboCount(), this.player.isSneaking(), this.player.getInventory().selectedSlot, targets);
