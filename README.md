@@ -23,7 +23,9 @@ This is an example weapon_attribute file where all added values are present (wit
 		"two_handed_pose": "",
 		"attacks": [
 			{
-				"stamina_cost_multiplier": 1.0,
+				"attack_speed_multiplier": 1.0,
+                "movement_speed_multiplier": 1.0,
+                "stamina_cost_multiplier": 1.0,
 				"damage_type": ""
 			}
 		]

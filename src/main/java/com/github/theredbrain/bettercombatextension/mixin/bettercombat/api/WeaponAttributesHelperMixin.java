@@ -39,6 +39,8 @@ public class WeaponAttributesHelperMixin {
 				} else {
 					base = new WeaponAttributes.Attack((WeaponAttributes.Condition[]) null, (WeaponAttributes.HitBoxShape) null, 0.0, 0.0, 0.0, (String) null, (WeaponAttributes.Sound) null, (WeaponAttributes.Sound) null);
 					((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$setDamageType("");
+					((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$setAttackSpeedMultiplier(1.0F);
+					((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$setMovementSpeedMultiplier(1.0F);
 					((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$setStaminaCostMultiplier(1.0F);
 				}
 				WeaponAttributes.Attack override = b.attacks()[i];
@@ -49,6 +51,20 @@ public class WeaponAttributesHelperMixin {
 					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setDamageType(override_damageType);
 				} else {
 					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setDamageType(((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$getDamageType());
+				}
+
+				float override_attackSpeedMultiplier = ((DuckWeaponAttributesAttackMixin) (Object) override).bettercombatextension$getAttackSpeedMultiplier();
+				if (override_attackSpeedMultiplier != 1.0F) {
+					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setAttackSpeedMultiplier(override_attackSpeedMultiplier);
+				} else {
+					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setAttackSpeedMultiplier(((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$getAttackSpeedMultiplier());
+				}
+
+				float override_movementSpeedMultiplier = ((DuckWeaponAttributesAttackMixin) (Object) override).bettercombatextension$getMovementSpeedMultiplier();
+				if (override_movementSpeedMultiplier != 1.0F) {
+					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setMovementSpeedMultiplier(override_movementSpeedMultiplier);
+				} else {
+					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setMovementSpeedMultiplier(((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$getMovementSpeedMultiplier());
 				}
 
 				float override_staminaCostMultiplier = ((DuckWeaponAttributesAttackMixin) (Object) override).bettercombatextension$getStaminaCostMultiplier();

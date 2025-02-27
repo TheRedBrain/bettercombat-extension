@@ -1,11 +1,15 @@
 package com.github.theredbrain.bettercombatextension.mixin.client.network;
 
 import com.github.theredbrain.bettercombatextension.BetterCombatExtension;
+import com.github.theredbrain.bettercombatextension.bettercombat.DuckWeaponAttributesAttackMixin;
 import com.github.theredbrain.bettercombatextension.client.DuckMinecraftClientMixin;
 import com.mojang.authlib.GameProfile;
 import net.bettercombat.BetterCombat;
+import net.bettercombat.api.AttackHand;
 import net.bettercombat.api.MinecraftClient_BetterCombat;
+import net.bettercombat.api.WeaponAttributes;
 import net.bettercombat.config.ServerConfig;
+import net.bettercombat.logic.PlayerAttackHelper;
 import net.bettercombat.utils.MathHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -60,10 +64,19 @@ public abstract class ClientPlayerEntityMixin_BetterCombatReplacementMixin exten
 		ItemStack activeItemStack = this.getStackInHand(((DuckMinecraftClientMixin) this.client).bettercombatextension$getCurrentAttackHand());
 		boolean isMovementPenaltyIgnored = activeItemStack.isIn(BetterCombatExtension.IGNORES_ATTACK_MOVEMENT_PENALTY) && isWeaponSwingInProgress;
 		ClientPlayerEntity clientPlayer = (ClientPlayerEntity) (Object) this;
-		if (multiplier != 1.0 && !isMovementPenaltyIgnored) {
+		MinecraftClient_BetterCombat client = (MinecraftClient_BetterCombat) MinecraftClient.getInstance();
+
+		// attack specific movement modifier
+		double attack_specific_modifier = 1.0;
+		AttackHand attackHand = PlayerAttackHelper.getCurrentAttack(clientPlayer, client.getComboCount());
+		if (attackHand != null) {
+			attack_specific_modifier = Math.min(Math.max(((DuckWeaponAttributesAttackMixin) (Object) attackHand.attack()).bettercombatextension$getMovementSpeedMultiplier(), 0.0), 1.0);
+		}
+
+		if ((attack_specific_modifier != 1.0 || multiplier != 1.0) && !isMovementPenaltyIgnored) {
 			if (!clientPlayer.hasVehicle() || config.movement_speed_effected_while_mounting) {
-				MinecraftClient_BetterCombat client = (MinecraftClient_BetterCombat) MinecraftClient.getInstance();
 				float swingProgress = client.getSwingProgress();
+
 				if ((double) swingProgress < 1/*0.98*/) {
 					if (config.movement_speed_applied_smoothly) {
 						double p2 = 0.0;
@@ -73,13 +86,18 @@ public abstract class ClientPlayerEntityMixin_BetterCombatReplacementMixin exten
 							p2 = MathHelper.easeOutCubic(1.0 - ((double) swingProgress - 0.5) * 2.0);
 						}
 
-						multiplier = (double) ((float) (1.0 - (1.0 - multiplier) * p2));
+						if (multiplier != 1.0) {
+							multiplier = (double) ((float) (1.0 - (1.0 - multiplier) * p2));
+						}
+						if (attack_specific_modifier != 1.0) {
+							attack_specific_modifier = (double) ((float) (1.0 - (1.0 - attack_specific_modifier) * p2));
+						}
 					}
 
 					Input var10000 = clientPlayer.input;
-					var10000.movementForward = (float) ((double) var10000.movementForward * multiplier);
+					var10000.movementForward = (float) ((double) var10000.movementForward * multiplier * attack_specific_modifier);
 					var10000 = clientPlayer.input;
-					var10000.movementSideways = (float) ((double) var10000.movementSideways * multiplier);
+					var10000.movementSideways = (float) ((double) var10000.movementSideways * multiplier * attack_specific_modifier);
 				}
 			}
 		}

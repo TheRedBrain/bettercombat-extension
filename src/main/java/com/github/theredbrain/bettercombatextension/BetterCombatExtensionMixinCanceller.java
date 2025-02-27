@@ -16,6 +16,9 @@ public class BetterCombatExtensionMixinCanceller implements MixinCanceller {
 		if (mixinClassName.equals("net.bettercombat.mixin.client.ClientPlayerEntityMixin")) {
 			return true;
 		}
+		if (mixinClassName.equals("net.bettercombat.mixin.PlayerEntityMixin")) {
+			return true;
+		}
 		return false;
 	}
 }
