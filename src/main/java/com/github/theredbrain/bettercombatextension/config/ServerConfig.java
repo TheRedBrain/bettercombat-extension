@@ -75,4 +75,14 @@ public class ServerConfig extends Config {
 			Default: 1.0
 			""")
 	public ValidatedFloat global_attack_stamina_cost_multiplier = new ValidatedFloat(1.0F);
+	@Comment("""
+			The global movement speed modifier while attacking is clamped by these two values.
+			""")
+	public ValidatedFloat minimum_global_attack_movement_speed_multiplier = new ValidatedFloat(0.0F);
+	public ValidatedFloat maximum_global_attack_movement_speed_multiplier = new ValidatedFloat(1.0F);
+	@Comment("""
+			The attack specific movement speed modifiers are clamped by these two values.
+			""")
+	public ValidatedFloat minimum_attack_specific_movement_speed_multiplier = new ValidatedFloat(0.0F);
+	public ValidatedFloat maximum_attack_specific_movement_speed_multiplier = new ValidatedFloat(1.0F);
 }

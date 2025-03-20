@@ -60,7 +60,14 @@ public abstract class ClientPlayerEntityMixin_BetterCombatReplacementMixin exten
 	public void bettercombatextension$tickMovement(CallbackInfo ci) {
 		boolean isWeaponSwingInProgress = ((MinecraftClient_BetterCombat) this.client).isWeaponSwingInProgress();
 		ServerConfig config = BetterCombat.config;
-		double multiplier = Math.min(Math.max((double) config.movement_speed_while_attacking, 0.0), 1.0);
+		com.github.theredbrain.bettercombatextension.config.ServerConfig betterCombatExtensionServerConfig = BetterCombatExtension.SERVER_CONFIG;
+		double multiplier = Math.min(
+				Math.max(
+						(double) config.movement_speed_while_attacking,
+						betterCombatExtensionServerConfig.minimum_global_attack_movement_speed_multiplier.get()
+				),
+				betterCombatExtensionServerConfig.maximum_global_attack_movement_speed_multiplier.get()
+		);
 		ItemStack activeItemStack = this.getStackInHand(((DuckMinecraftClientMixin) this.client).bettercombatextension$getCurrentAttackHand());
 		boolean isMovementPenaltyIgnored = activeItemStack.isIn(BetterCombatExtension.IGNORES_ATTACK_MOVEMENT_PENALTY) && isWeaponSwingInProgress;
 		ClientPlayerEntity clientPlayer = (ClientPlayerEntity) (Object) this;
@@ -70,7 +77,13 @@ public abstract class ClientPlayerEntityMixin_BetterCombatReplacementMixin exten
 		double attack_specific_modifier = 1.0;
 		AttackHand attackHand = PlayerAttackHelper.getCurrentAttack(clientPlayer, client.getComboCount());
 		if (attackHand != null) {
-			attack_specific_modifier = Math.min(Math.max(((DuckWeaponAttributesAttackMixin) (Object) attackHand.attack()).bettercombatextension$getMovementSpeedMultiplier(), 0.0), 1.0);
+			attack_specific_modifier = Math.min(
+					Math.max(
+							((DuckWeaponAttributesAttackMixin) (Object) attackHand.attack()).bettercombatextension$getMovementSpeedMultiplier(),
+							betterCombatExtensionServerConfig.minimum_attack_specific_movement_speed_multiplier.get()
+					),
+					betterCombatExtensionServerConfig.maximum_attack_specific_movement_speed_multiplier.get()
+			);
 		}
 
 		if ((attack_specific_modifier != 1.0 || multiplier != 1.0) && !isMovementPenaltyIgnored) {
@@ -101,7 +114,6 @@ public abstract class ClientPlayerEntityMixin_BetterCombatReplacementMixin exten
 				}
 			}
 		}
-		var betterCombatExtensionServerConfig = BetterCombatExtension.SERVER_CONFIG;
 		boolean isMovementLockingDisabled = activeItemStack.isIn(BetterCombatExtension.DISABLES_MOVEMENT_LOCKING_DURING_ATTACK);
 		if (betterCombatExtensionServerConfig.enable_movement_locking_attacks.get() && !isMovementLockingDisabled && isWeaponSwingInProgress) {
 			boolean isVehicleDisablingMovementLocking = clientPlayer.getVehicle() != null && clientPlayer.getVehicle().getType().isIn(BetterCombatExtension.DISABLES_MOVEMENT_LOCKING_WHEN_RIDDEN);
