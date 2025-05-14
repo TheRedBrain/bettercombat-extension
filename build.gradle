@@ -149,13 +149,18 @@ if(project.hasProperty('release_type')) {
 			addGameVersion "${project.minecraft_version}"
 			addGameVersion "${project.minecraft_version_compat}"
 			addGameVersion "Fabric"
+			addGameVersion "NeoForge"
 
 			relations {
 				requiredDependency 'fabric-api'
 				requiredDependency 'fzzy-config'
 				requiredDependency 'better-combat-by-daedelus'
+				requiredDependency 'forgified-fabric-api'
+				requiredDependency 'sinytra-connector'
+				requiredDependency 'connector-extras'
 				optionalDependency 'shoulder-surfing-reloaded'
 				optionalDependency 'stamina-attributes'
+				optionalDependency 'rpg-inventory'
 			}
 
 			mainArtifact(remapJar)
@@ -187,6 +192,7 @@ if(project.hasProperty('release_type')) {
 			required.project 'better-combat'
 			optional.project 'shoulder-surfing-reloaded'
 			optional.project 'stamina-attributes'
+			optional.project 'rpg-inventory'
 		}
 	}
 
