@@ -1,13 +1,13 @@
 package com.github.theredbrain.bettercombatextension;
 
+import com.github.theredbrain.bettercombatextension.compat.RPGInventoryCompat;
+import com.github.theredbrain.bettercombatextension.compat.StaminaAttributesCompat;
 import com.github.theredbrain.bettercombatextension.config.ServerConfig;
 import com.github.theredbrain.bettercombatextension.network.packet.AttackStaminaCostPacket;
 import com.github.theredbrain.bettercombatextension.network.packet.AttackStaminaCostPacketReceiver;
 import com.github.theredbrain.bettercombatextension.network.packet.CancelAttackPacket;
-import com.github.theredbrain.staminaattributes.entity.StaminaUsingEntity;
 import me.fzzyhmstrs.fzzy_config.api.ConfigApiJava;
 import me.fzzyhmstrs.fzzy_config.api.RegisterType;
-import net.bettercombat.api.WeaponAttributes;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -15,8 +15,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -30,23 +28,34 @@ public class BetterCombatExtension implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ServerConfig SERVER_CONFIG = ConfigApiJava.registerAndLoadConfig(ServerConfig::new, RegisterType.BOTH);
 
+	public static final boolean isRPGInventoryLoaded = FabricLoader.getInstance().isModLoaded("rpginventory");
 	public static final boolean isShoulderSurfingLoaded = FabricLoader.getInstance().isModLoaded("shouldersurfing");
-
 	public static final boolean isStaminaAttributesLoaded = FabricLoader.getInstance().isModLoaded("staminaattributes");
 
 	public static RegistryEntry<EntityAttribute> ATTACK_STAMINA_COST;
 
+	public static boolean isRPGInventoryHandSlotOverhaulActive() {
+		if (isRPGInventoryLoaded) {
+			return RPGInventoryCompat.isHandSlotOverhaulActive();
+		}
+		return false;
+	}
+
+	public static boolean shouldAlternativeHandSwapAlgorithmBeEnabled() {
+		return isRPGInventoryHandSlotOverhaulActive() && SERVER_CONFIG.enable_experimental_swap_hand_attributes_algorithm.get();
+	}
+
 	public static float getCurrentStamina(LivingEntity livingEntity) {
 		float currentStamina = 0.0F;
 		if (isStaminaAttributesLoaded) {
-			currentStamina = ((StaminaUsingEntity) livingEntity).staminaattributes$getStamina();
+			currentStamina = StaminaAttributesCompat.getCurrentStamina(livingEntity);
 		}
 		return currentStamina;
 	}
 
 	public static void addStamina(LivingEntity livingEntity, float amount) {
 		if (isStaminaAttributesLoaded) {
-			((StaminaUsingEntity) livingEntity).staminaattributes$addStamina(amount);
+			StaminaAttributesCompat.addStamina(livingEntity, amount);
 		}
 	}
 

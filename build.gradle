@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.9-SNAPSHOT'
+	id 'fabric-loom' version '1.10-SNAPSHOT'
 	id "com.matthewprenger.cursegradle" version "1.4.0"
 	id "com.github.breadmoirai.github-release" version "2.4.1"
 	id "com.modrinth.minotaur" version "2.+"
@@ -89,6 +89,9 @@ dependencies {
 
 	// Resource Bar API
 	modImplementation "maven.modrinth:resource-bar-api:${project.resource_bar_api_version}"
+
+	// RPG Inventory
+	modImplementation "maven.modrinth:rpg-inventory:${project.rpg_inventory_version}"
 
 	// Mixin Squared
 	include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.1.2-beta.4")))

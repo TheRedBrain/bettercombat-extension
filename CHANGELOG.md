@@ -1,3 +1,8 @@
+# 2.6.0
+
+- added support for Better Combat version 2.2.2
+- the item duplication fix for RPG Inventory x Better Combat is now automatically enabled if RPG Inventory is installed and the 'hand slot overhaul' is enabled. The existing server config overrides this. Note that disabling this setting also disables the 'hand slot overhaul'.
+
 # 2.5.0
 
 - re-added compat with 1.21

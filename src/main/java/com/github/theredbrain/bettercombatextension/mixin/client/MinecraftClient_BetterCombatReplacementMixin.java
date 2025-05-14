@@ -29,7 +29,6 @@ import net.bettercombat.utils.PatternMatching;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -64,9 +63,6 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	public @Nullable ClientPlayerEntity player;
 	@Shadow
 	private int itemUseCooldown;
-	@Shadow
-	@Final
-	public TextRenderer textRenderer;
 	@Shadow
 	public int attackCooldown;
 	@Shadow
@@ -117,8 +113,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	private void pre_doAttack(CallbackInfoReturnable<Boolean> info) {
 		if (BetterCombatClientMod.ENABLED) {
 			MinecraftClient client = this.thisClient();
-			ItemStack mainHandStack = client.player.getMainHandStack();
-			WeaponAttributes attributes = WeaponRegistry.getAttributes(mainHandStack);
+            WeaponAttributes attributes = WeaponRegistry.getAttributes(client.player.getMainHandStack());
 			if (attributes != null && attributes.attacks() != null) {
 				if (this.isTargetingMineableBlock() || this.isHarvesting) {
 					this.isHarvesting = true;
@@ -141,8 +136,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	private void pre_handleBlockBreaking(boolean bl, CallbackInfo ci) {
 		if (BetterCombatClientMod.ENABLED) {
 			MinecraftClient client = this.thisClient();
-			ItemStack mainHandStack = client.player.getMainHandStack();
-			WeaponAttributes attributes = WeaponRegistry.getAttributes(mainHandStack);
+            WeaponAttributes attributes = WeaponRegistry.getAttributes(client.player.getMainHandStack());
 			if (attributes != null && attributes.attacks() != null) {
 				boolean isPressed = client.options.attackKey.isPressed();
 				if (isPressed && !this.isHoldingAttackInput) {
@@ -225,6 +219,8 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	@Unique
 	private boolean shouldSwingThruGrass() {
 		if (!BetterCombatClientMod.config.isSwingThruGrassEnabled) {
+			return false;
+		} else if (BetterCombatClientMod.config.isSwingThruGrassSmart && !this.hasTargetsInReach()) {
 			return false;
 		} else {
 			String regex = BetterCombatClientMod.config.swingThruGrassBlacklist;
@@ -404,7 +400,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 							}
 						}
 
-						Packets.C2S_AttackRequest packet = new Packets.C2S_AttackRequest(this.getComboCount(), this.player.isSneaking(), this.player.getInventory().selectedSlot, targets);
+						Packets.C2S_AttackRequest packet = new Packets.C2S_AttackRequest(this.getComboCount(), this.player.isSneaking(), this.player.getInventory().selectedSlot, cursorTarget, targets);
 						Platform.networkC2S_Send(packet);
 						Iterator var8 = targets.iterator();
 

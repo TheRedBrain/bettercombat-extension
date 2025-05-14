@@ -33,14 +33,16 @@ This is an example weapon_attribute file where all added values are present (wit
 
 ## Server Config
 
-###  Better Combat x RPG Inventory Compatibility Experiment
+###  Better Combat x RPG Inventory Compatibility
 
-Setting the "enable_experimental_swap_hand_attributes_algorithm" setting in the server config to true, enables this experimental compatibility.
-This solves an item duplication glitch when using "Better Combat" and "RPG Inventory" together.
+Better Combat Extension fixes an incompatibility between Better Combats offhand attacking and RPG Inventory's hand slot overhaul.
 
-> This fix is very experimental!
->
-> Please report any issues you encounter when using this setting.
+This fix is only active when RPG Inventory is installed and the hand slot overhaul is enabled.
+
+This setting can disables the fix completely.
+
+WARNING:
+Setting this option to false will disable the RPG Inventory hand slot overhaul. This is done to prevent item duplication glitches.
 
 ### Movement Locking Attacks
 

@@ -26,7 +26,6 @@ public abstract class TargetFinderMixin {
 	}
 
 	/**
-	 *
 	 * @author TheRedBrain
 	 * @reason integrate "restricted_attack_pitch" option
 	 */
@@ -40,9 +39,12 @@ public abstract class TargetFinderMixin {
 
 		boolean isSpinAttack = attack.angle() > 180.0;
 		Vec3d size = WeaponHitBoxes.createHitbox(attack.hitbox(), attackRange, isSpinAttack);
+
+		// restrict attack pitch
 		ServerConfig serverConfig = BetterCombatExtension.SERVER_CONFIG;
 		float attackPitch = serverConfig.restrict_attack_pitch.get() ? MathHelper.clamp(player.getPitch(), -serverConfig.attack_pitch_range.get(), serverConfig.attack_pitch_range.get()) : player.getPitch();
 		OrientedBoundingBox obb = new OrientedBoundingBox(origin, size, attackPitch, player.getYaw());
+
 		if (!isSpinAttack) {
 			obb = obb.offsetAlongAxisZ(size.z / 2.0);
 		}
@@ -52,7 +54,7 @@ public abstract class TargetFinderMixin {
 		entities = collisionFilter.filter(entities);
 		TargetFinder.RadialFilter radialFilter = new TargetFinder.RadialFilter(origin, obb.axisZ, attackRange, attack.angle());
 		entities = radialFilter.filter(entities);
-		return new TargetFinder.TargetResult(entities, obb);
+		return new TargetFinder.TargetResult(cursorTarget, entities, obb);
 	}
 
 }

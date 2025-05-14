@@ -13,17 +13,6 @@ public class ServerConfig extends Config {
 		super(BetterCombatExtension.identifier("server"));
 	}
 	@Comment("""
-			WARNING: EXPERIMENTAL
-			
-			In 1.21.1, Better Combats attacking with weapons in the offhand slot is incompatible with RPG Inventory
-			
-			Setting this option to true, fixes the incompatibility. This may have unexpected consequences.
-			Please report any issues you encounter when using this setting
-			
-			Default: false
-			""")
-	public ValidatedBoolean enable_experimental_swap_hand_attributes_algorithm = new ValidatedBoolean(false);
-	@Comment("""
 			When set to true, changing the players orientation and position while attacking is disabled.
 			It is recommended to install Shoulder Surfing Reloaded, play in the third person perspective and activate the decoupled camera setting.
 			Since the movement_multiplier setting in the Better Combat server config has no effect when this is set to true, it is recommended to set it to its default of 1.0.
@@ -86,4 +75,17 @@ public class ServerConfig extends Config {
 			Default: 1.0
 			""")
 	public ValidatedFloat global_attack_stamina_cost_multiplier = new ValidatedFloat(1.0F);
+	@Comment("""
+			Better Combat Extension fixes an incompatibility between Better Combats offhand attacking and RPG Inventory's hand slot overhaul.
+			
+			This fix is only active when RPG Inventory is installed and the hand slot overhaul is enabled.
+			
+			This setting can disables the fix completely.
+			
+			WARNING:
+			Setting this option to false will disable the RPG Inventory hand slot overhaul. This is done to prevent item duplication glitches.
+			
+			Default: true
+			""")
+	public ValidatedBoolean enable_experimental_swap_hand_attributes_algorithm = new ValidatedBoolean(true);
 }
