@@ -90,6 +90,9 @@ dependencies {
 	// Resource Bar API
 	modImplementation "maven.modrinth:resource-bar-api:${project.resource_bar_api_version}"
 
+	// Slot Customization API
+	modImplementation "maven.modrinth:slot-customization-api:${project.slot_customization_api_version}"
+
 	// RPG Inventory
 	modImplementation "maven.modrinth:rpg-inventory:${project.rpg_inventory_version}"
 

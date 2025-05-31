@@ -1,4 +1,4 @@
-package com.github.theredbrain.bettercombatextension.compatability;
+package com.github.theredbrain.bettercombatextension.compat;
 
 import com.github.exopandora.shouldersurfing.api.client.ShoulderSurfing;
 import com.github.exopandora.shouldersurfing.config.Config;

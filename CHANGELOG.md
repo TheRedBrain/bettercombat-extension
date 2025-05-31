@@ -1,3 +1,7 @@
+# 2.6.1
+
+- now works with Better Combat version 2.2.4
+
 # 2.6.0
 
 - added support for Better Combat version 2.2.2

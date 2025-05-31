@@ -1,7 +1,7 @@
 package com.github.theredbrain.bettercombatextension.mixin.client;
 
 import com.github.theredbrain.bettercombatextension.BetterCombatExtension;
-import com.github.theredbrain.bettercombatextension.compatability.ShoulderSurfingCompat;
+import com.github.theredbrain.bettercombatextension.compat.ShoulderSurfingCompat;
 import net.bettercombat.api.MinecraftClient_BetterCombat;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
