@@ -10,7 +10,8 @@
     "bettercombat.client.collision.TargetFinderMixin",
     "entity.LivingEntityMixin",
     "entity.attribute.EntityAttributesMixin",
-    "entity.damage.DamageSourcesMixin"
+    "entity.damage.DamageSourcesMixin",
+    "entity.player.PlayerEntity_BetterCombatReplacementMixin"
   ],
   "injectors": {
     "defaultRequire": 1

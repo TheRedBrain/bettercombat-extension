@@ -1,6 +1,11 @@
-# 2.6.1
+# 2.7.0
 
 - now works with Better Combat version 2.2.4
+- added 3 new optional fields to attacks:
+  - 'attack_range_multiplier', multiplies the attack range during the attack
+  - 'attack_speed_multiplier', multiplies the attack speed during the attack
+  - 'movement_speed_multiplier', multiplies the movement speed during the attack
+- added new server config options that control the minimum and maximum values of movement speed modifiers
 
 # 2.6.0
 

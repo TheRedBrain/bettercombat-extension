@@ -76,6 +76,16 @@ public class ServerConfig extends Config {
 			""")
 	public ValidatedFloat global_attack_stamina_cost_multiplier = new ValidatedFloat(1.0F);
 	@Comment("""
+			The global movement speed modifier while attacking is clamped by these two values.
+			""")
+	public ValidatedFloat minimum_global_attack_movement_speed_multiplier = new ValidatedFloat(0.0F);
+	public ValidatedFloat maximum_global_attack_movement_speed_multiplier = new ValidatedFloat(1.0F);
+	@Comment("""
+			The attack specific movement speed modifiers are clamped by these two values.
+			""")
+	public ValidatedFloat minimum_attack_specific_movement_speed_multiplier = new ValidatedFloat(0.0F);
+	public ValidatedFloat maximum_attack_specific_movement_speed_multiplier = new ValidatedFloat(1.0F);
+	@Comment("""
 			Better Combat Extension fixes an incompatibility between Better Combats offhand attacking and RPG Inventory's hand slot overhaul.
 			
 			This fix is only active when RPG Inventory is installed and the hand slot overhaul is enabled.

@@ -41,6 +41,9 @@ public class WeaponAttributesHelperMixin {
 					base = new WeaponAttributes.Attack((WeaponAttributes.Condition[]) null, (WeaponAttributes.HitBoxShape) null, 0.0, 0.0, 0.0, (String) null, (WeaponAttributes.Sound) null, (WeaponAttributes.Sound) null);
 					((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$setDamageType("");
 					((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$setStaminaCostMultiplier(1.0F);
+					((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$setAttackRangeMultiplier(1.0F);
+					((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$setAttackSpeedMultiplier(1.0F);
+					((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$setMovementSpeedMultiplier(1.0F);
 				}
 				WeaponAttributes.Attack override = b.attacks()[i];
 				WeaponAttributes.Attack attack = new WeaponAttributes.Attack(override.conditions() != null ? override.conditions() : base.conditions(), override.hitbox() != null ? override.hitbox() : base.hitbox(), override.damageMultiplier() != 0.0 ? override.damageMultiplier() : base.damageMultiplier(), override.angle() != 0.0 ? override.angle() : base.angle(), override.upswing() != 0.0 ? override.upswing() : base.upswing(), override.animation() != null ? override.animation() : base.animation(), override.swingSound() != null ? override.swingSound() : base.swingSound(), override.impactSound() != null ? override.impactSound() : base.impactSound());
@@ -57,6 +60,27 @@ public class WeaponAttributesHelperMixin {
 					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setStaminaCostMultiplier(override_staminaCostMultiplier);
 				} else {
 					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setStaminaCostMultiplier(((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$getStaminaCostMultiplier());
+				}
+
+				float override_attackRangeMultiplier = ((DuckWeaponAttributesAttackMixin) (Object) override).bettercombatextension$getAttackRangeMultiplier();
+				if (override_staminaCostMultiplier != 1.0F) {
+					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setAttackRangeMultiplier(override_attackRangeMultiplier);
+				} else {
+					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setAttackRangeMultiplier(((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$getAttackRangeMultiplier());
+				}
+
+				float override_attackSpeedMultiplier = ((DuckWeaponAttributesAttackMixin) (Object) override).bettercombatextension$getAttackSpeedMultiplier();
+				if (override_attackSpeedMultiplier != 1.0F) {
+					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setAttackSpeedMultiplier(override_attackSpeedMultiplier);
+				} else {
+					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setAttackSpeedMultiplier(((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$getAttackSpeedMultiplier());
+				}
+
+				float override_movementSpeedMultiplier = ((DuckWeaponAttributesAttackMixin) (Object) override).bettercombatextension$getMovementSpeedMultiplier();
+				if (override_movementSpeedMultiplier != 1.0F) {
+					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setMovementSpeedMultiplier(override_movementSpeedMultiplier);
+				} else {
+					((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$setMovementSpeedMultiplier(((DuckWeaponAttributesAttackMixin) (Object) base).bettercombatextension$getMovementSpeedMultiplier());
 				}
 
 				overrideAttacks.add(attack);

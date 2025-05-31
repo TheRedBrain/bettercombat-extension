@@ -1,6 +1,7 @@
 package com.github.theredbrain.bettercombatextension.mixin.bettercombat.client.collision;
 
 import com.github.theredbrain.bettercombatextension.BetterCombatExtension;
+import com.github.theredbrain.bettercombatextension.bettercombat.DuckWeaponAttributesAttackMixin;
 import com.github.theredbrain.bettercombatextension.config.ServerConfig;
 import net.bettercombat.api.WeaponAttributes;
 import net.bettercombat.api.client.AttackRangeExtensions;
@@ -32,6 +33,10 @@ public abstract class TargetFinderMixin {
 	@Overwrite
 	public static TargetFinder.TargetResult findAttackTargetResult(PlayerEntity player, Entity cursorTarget, WeaponAttributes.Attack attack, double attackRange) {
 		Vec3d origin = TargetFinder.getInitialTracingPoint(player);
+
+		// apply attack specific range multipliers
+		attackRange *= ((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$getAttackRangeMultiplier();
+
 		List<Entity> entities = TargetFinder.getInitialTargets(player, cursorTarget, attackRange);
 		if (!AttackRangeExtensions.sources().isEmpty()) {
 			attackRange = applyAttackRangeModifiers(player, attackRange);
