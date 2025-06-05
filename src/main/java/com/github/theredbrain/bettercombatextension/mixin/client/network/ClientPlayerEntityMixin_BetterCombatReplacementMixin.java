@@ -76,13 +76,13 @@ public abstract class ClientPlayerEntityMixin_BetterCombatReplacementMixin exten
 		double attack_specific_modifier = 1.0;
 		AttackHand attackHand = PlayerAttackHelper.getCurrentAttack(clientPlayer, client.getComboCount());
 		if (attackHand != null) {
-				attack_specific_modifier = Math.min(
-				Math.max(
-						((DuckWeaponAttributesAttackMixin) (Object) attackHand.attack()).bettercombatextension$getMovementSpeedMultiplier(),
-						betterCombatExtensionServerConfig.minimum_attack_specific_movement_speed_multiplier.get()
-				),
-				betterCombatExtensionServerConfig.maximum_attack_specific_movement_speed_multiplier.get()
-		);
+			attack_specific_modifier = Math.min(
+					Math.max(
+							((DuckWeaponAttributesAttackMixin) (Object) attackHand.attack()).bettercombatextension$getMovementSpeedMultiplier(),
+							betterCombatExtensionServerConfig.minimum_attack_specific_movement_speed_multiplier.get()
+					),
+					betterCombatExtensionServerConfig.maximum_attack_specific_movement_speed_multiplier.get()
+			);
 		}
 
 		if ((attack_specific_modifier != 1.0 || multiplier != 1.0) && !isMovementPenaltyIgnored) {

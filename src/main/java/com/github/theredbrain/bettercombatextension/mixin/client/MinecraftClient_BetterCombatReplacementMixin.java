@@ -113,7 +113,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	private void pre_doAttack(CallbackInfoReturnable<Boolean> info) {
 		if (BetterCombatClientMod.ENABLED) {
 			MinecraftClient client = this.thisClient();
-            WeaponAttributes attributes = WeaponRegistry.getAttributes(client.player.getMainHandStack());
+			WeaponAttributes attributes = WeaponRegistry.getAttributes(client.player.getMainHandStack());
 			if (attributes != null && attributes.attacks() != null) {
 				if (this.isTargetingMineableBlock() || this.isHarvesting) {
 					this.isHarvesting = true;
@@ -136,7 +136,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	private void pre_handleBlockBreaking(boolean bl, CallbackInfo ci) {
 		if (BetterCombatClientMod.ENABLED) {
 			MinecraftClient client = this.thisClient();
-            WeaponAttributes attributes = WeaponRegistry.getAttributes(client.player.getMainHandStack());
+			WeaponAttributes attributes = WeaponRegistry.getAttributes(client.player.getMainHandStack());
 			if (attributes != null && attributes.attacks() != null) {
 				boolean isPressed = client.options.attackKey.isPressed();
 				if (isPressed && !this.isHoldingAttackInput) {
@@ -393,7 +393,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 						if (targets.size() == 0) {
 							PlatformClient.onEmptyLeftClick(this.player);
 							if (this.crosshairTarget.getType() == HitResult.Type.BLOCK) {
-								BlockHitResult blockHitResult = (BlockHitResult)this.crosshairTarget;
+								BlockHitResult blockHitResult = (BlockHitResult) this.crosshairTarget;
 								BlockPos pos = blockHitResult.getBlockPos();
 								Packets.C2S_BlockHit packet = new Packets.C2S_BlockHit(pos);
 								Platform.networkC2S_Send(packet);
@@ -404,8 +404,8 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 						Platform.networkC2S_Send(packet);
 						Iterator var8 = targets.iterator();
 
-						while(var8.hasNext()) {
-							Entity target = (Entity)var8.next();
+						while (var8.hasNext()) {
+							Entity target = (Entity) var8.next();
 							this.player.attack(target);
 						}
 

@@ -1,6 +1,7 @@
 package com.github.theredbrain.bettercombatextension.mixin.bettercombat;
 
 import com.github.theredbrain.bettercombatextension.BetterCombatExtension;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.bettercombat.api.WeaponAttributes;
 import net.bettercombat.logic.PlayerAttackHelper;
 import net.bettercombat.logic.WeaponRegistry;
@@ -12,8 +13,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 
 @Mixin(PlayerAttackHelper.class)
@@ -25,10 +24,9 @@ public abstract class PlayerAttackHelperMixin {
 		throw new AssertionError();
 	}
 
-	@Inject(method = "isDualWielding", at = @At("RETURN"), cancellable = true)
-	private static void bettercombatextension$isDualWielding(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
-		cir.setReturnValue(cir.getReturnValue() && !(!player.getMainHandStack().isIn(BetterCombatExtension.EMPTY_HAND_WEAPONS) && player.getOffHandStack().isIn(BetterCombatExtension.EMPTY_HAND_WEAPONS)));
-		cir.cancel();
+	@ModifyReturnValue(method = "isDualWielding(Lnet/minecraft/entity/player/PlayerEntity;)Z", at = @At("RETURN"))
+	private static boolean bettercombatextension$isDualWielding(boolean original, PlayerEntity player) {
+		return original && !(!player.getMainHandStack().isIn(BetterCombatExtension.EMPTY_HAND_WEAPONS) && player.getOffHandStack().isIn(BetterCombatExtension.EMPTY_HAND_WEAPONS));
 	}
 
 	/**
@@ -50,7 +48,7 @@ public abstract class PlayerAttackHelperMixin {
 		if (!useOffHand) {
 			runnable.run();
 		} else {
-			synchronized(player) {
+			synchronized (player) {
 				PlayerInventory inventory = player.getInventory();
 				ItemStack mainHandStack = player.getMainHandStack();
 				ItemStack offHandStack = player.getOffHandStack();
