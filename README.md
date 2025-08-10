@@ -97,6 +97,10 @@ This is designed to work together with the mod [RPG Inventory](https://modrinth.
 
 Enabled when "enable_poses_while_sprinting" setting in client config is false.
 
+### Riding an entity disables weapon poses
+
+Enabled when "enable_poses_while_mounted" setting in client config is false.
+
 ### Skipping attacks with feinting
 
 Enabled when "feinting_increases_combo_count" setting in server config is true.

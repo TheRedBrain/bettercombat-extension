@@ -1,3 +1,9 @@
+# 2.8.0
+
+- added client config option to disable weapon poses while mounted
+- fixed an issue with the RPG Inventory integration, where attacking with an empty main hand and a weapon in the offhand could duplicate items
+- fixed an issue where the configs where initialized too early
+
 # 2.7.0
 
 - now works with Better Combat version 2.2.4
