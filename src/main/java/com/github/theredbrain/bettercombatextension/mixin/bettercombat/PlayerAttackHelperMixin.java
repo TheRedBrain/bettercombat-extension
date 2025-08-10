@@ -61,7 +61,11 @@ public abstract class PlayerAttackHelperMixin {
 				}
 				runnable.run();
 				if (BetterCombatExtension.shouldAlternativeHandSwapAlgorithmBeEnabled()) {
-					BetterCombatExtension.setRPGInventoryMainHandSlot(inventory, mainHandStack);
+					if (!mainHandStack.isIn(BetterCombatExtension.EMPTY_HAND_WEAPONS)) {
+						BetterCombatExtension.setRPGInventoryMainHandSlot(inventory, mainHandStack);
+					} else {
+						BetterCombatExtension.setRPGInventoryMainHandSlot(inventory, ItemStack.EMPTY);
+					}
 					inventory.offHand.set(0, offHandStack);
 				} else {
 					inventory.main.set(inventory.selectedSlot, mainHandStack);
