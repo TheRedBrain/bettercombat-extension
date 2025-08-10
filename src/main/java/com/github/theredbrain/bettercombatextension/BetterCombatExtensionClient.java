@@ -9,10 +9,11 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 public class BetterCombatExtensionClient implements ClientModInitializer {
-	public static ClientConfig CLIENT_CONFIG = ConfigApiJava.registerAndLoadConfig(ClientConfig::new, RegisterType.CLIENT);
+	public static ClientConfig CLIENT_CONFIG;
 
 	@Override
 	public void onInitializeClient() {
+		CLIENT_CONFIG = ConfigApiJava.registerAndLoadConfig(ClientConfig::new, RegisterType.CLIENT);
 
 		// Packets
 		ClientPlayNetworking.registerGlobalReceiver(CancelAttackPacket.PACKET_ID, new CancelAttackPacketReceiver());

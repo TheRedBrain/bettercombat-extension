@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 public class BetterCombatExtension implements ModInitializer {
 	public static final String MOD_ID = "bettercombatextension";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	public static ServerConfig SERVER_CONFIG = ConfigApiJava.registerAndLoadConfig(ServerConfig::new, RegisterType.BOTH);
+	public static ServerConfig SERVER_CONFIG;
 
 	public static final boolean isRPGInventoryLoaded = FabricLoader.getInstance().isModLoaded("rpginventory");
 	public static final boolean isShoulderSurfingLoaded = FabricLoader.getInstance().isModLoaded("shouldersurfing");
@@ -62,6 +62,7 @@ public class BetterCombatExtension implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		LOGGER.info("BetterCombat was extended!");
+		SERVER_CONFIG = ConfigApiJava.registerAndLoadConfig(ServerConfig::new, RegisterType.BOTH);
 
 		PayloadTypeRegistry.playS2C().register(CancelAttackPacket.PACKET_ID, CancelAttackPacket.PACKET_CODEC);
 
