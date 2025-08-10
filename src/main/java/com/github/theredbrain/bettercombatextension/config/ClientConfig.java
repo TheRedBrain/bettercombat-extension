@@ -9,5 +9,6 @@ public class ClientConfig extends Config {
 		super(BetterCombatExtension.identifier("client"));
 	}
 
-	public ValidatedBoolean enable_poses_while_sprinting = new ValidatedBoolean(true); // TODO move to client config
+	public ValidatedBoolean enable_poses_while_sprinting = new ValidatedBoolean(true);
+	public ValidatedBoolean enable_poses_while_mounted = new ValidatedBoolean(true);
 }
