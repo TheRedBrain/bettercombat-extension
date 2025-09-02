@@ -22,7 +22,7 @@ public abstract class MouseMixin {
 
 	@Inject(method = "updateMouse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;changeLookDirection(DD)V", ordinal = 0), cancellable = true)
 	private void bettercombatextension$updateMouse(CallbackInfo ci) {
-		if (BetterCombatExtension.SERVER_CONFIG.enable_movement_locking_attacks.get() && ((MinecraftClient_BetterCombat) this.client).isWeaponSwingInProgress() && !ShoulderSurfingCompat.isShoulderSurfingCameraDecoupled()) {
+		if (BetterCombatExtension.SERVER_CONFIG.enable_movement_locking_attacks.get() && ((MinecraftClient_BetterCombat) this.client).isWeaponSwingInProgress() && (!BetterCombatExtension.isShoulderSurfingLoaded || !ShoulderSurfingCompat.isShoulderSurfingCameraDecoupled())) {
 			ci.cancel();
 		}
 	}
