@@ -95,6 +95,7 @@ dependencies {
 
 	// RPG Inventory
 	modImplementation "maven.modrinth:rpg-inventory:${project.rpg_inventory_version}"
+//	modImplementation(files("libs/rpg-inventory-${project.rpg_inventory_version}.jar"))
 
 	// Mixin Squared
 	include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.1.2-beta.4")))
