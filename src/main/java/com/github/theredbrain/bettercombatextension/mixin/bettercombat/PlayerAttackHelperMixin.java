@@ -1,13 +1,12 @@
 package com.github.theredbrain.bettercombatextension.mixin.bettercombat;
 
 import com.github.theredbrain.bettercombatextension.BetterCombatExtension;
+import com.github.theredbrain.bettercombatextension.compat.RPGInventoryCompat;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.bettercombat.api.WeaponAttributes;
 import net.bettercombat.logic.PlayerAttackHelper;
 import net.bettercombat.logic.WeaponRegistry;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -46,33 +45,25 @@ public abstract class PlayerAttackHelperMixin {
 	public static void swapHandAttributes(PlayerEntity player, boolean useOffHand, Runnable runnable) {
 		if (!useOffHand) {
 			runnable.run();
+		} else if (BetterCombatExtension.shouldAlternativeHandSwapAlgorithmBeEnabled()) {
+			RPGInventoryCompat.swapHandAttributes(player, runnable);
 		} else {
 			synchronized (player) {
-				PlayerInventory inventory = player.getInventory();
-				ItemStack mainHandStack = player.getMainHandStack();
-				ItemStack offHandStack = player.getOffHandStack();
+				var inventory = player.getInventory();
+				var mainHandStack = player.getMainHandStack();
+				var offHandStack = inventory.offHand.get(0);
+
 				setAttributesForOffHandAttack(player, true);
-				if (BetterCombatExtension.shouldAlternativeHandSwapAlgorithmBeEnabled()) {
-					BetterCombatExtension.setRPGInventoryMainHandSlot(inventory, offHandStack);
-					inventory.offHand.set(0, offHandStack);
-				} else {
-					inventory.main.set(inventory.selectedSlot, offHandStack);
-					inventory.offHand.set(0, offHandStack);
-				}
+				inventory.main.set(inventory.selectedSlot, offHandStack);
+				inventory.offHand.set(0, offHandStack);
+
 				runnable.run();
-				if (BetterCombatExtension.shouldAlternativeHandSwapAlgorithmBeEnabled()) {
-					if (!mainHandStack.isIn(BetterCombatExtension.EMPTY_HAND_WEAPONS)) {
-						BetterCombatExtension.setRPGInventoryMainHandSlot(inventory, mainHandStack);
-					} else {
-						BetterCombatExtension.setRPGInventoryMainHandSlot(inventory, ItemStack.EMPTY);
-					}
-					inventory.offHand.set(0, offHandStack);
-				} else {
-					inventory.main.set(inventory.selectedSlot, mainHandStack);
-					inventory.offHand.set(0, offHandStack);
-				}
+
+				inventory.main.set(inventory.selectedSlot, mainHandStack);
+				inventory.offHand.set(0, offHandStack);
 				setAttributesForOffHandAttack(player, false);
 			}
 		}
 	}
+
 }
