@@ -1,3 +1,7 @@
+# 2.8.3
+
+- now works with Better Combat version 2.2.5
+
 # 2.8.2
 
 - fixed all known issues with the Better Combat X Hand Slot Overhaul compatibility
