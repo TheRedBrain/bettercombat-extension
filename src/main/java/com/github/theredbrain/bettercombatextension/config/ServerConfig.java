@@ -49,6 +49,7 @@ public class ServerConfig extends Config {
 			Default: false
 			""")
 	public ValidatedBoolean empty_offhand_equals_two_handing_mainhand = new ValidatedBoolean(false);
+	public ValidatedBoolean enable_attack_range_attribute_integration = new ValidatedBoolean(true);
 	@Comment("""
 			Disables Better Combat's formerly client feature of continuously attacking while holding down the attack key.
 			

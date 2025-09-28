@@ -1,5 +1,6 @@
 package com.github.theredbrain.bettercombatextension;
 
+import com.github.theredbrain.bettercombatextension.compat.AttackRangeAttributeCompat;
 import com.github.theredbrain.bettercombatextension.compat.RPGInventoryCompat;
 import com.github.theredbrain.bettercombatextension.compat.StaminaAttributesCompat;
 import com.github.theredbrain.bettercombatextension.config.ServerConfig;
@@ -15,6 +16,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -30,11 +33,36 @@ public class BetterCombatExtension implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ServerConfig SERVER_CONFIG;
 
+	public static final boolean isAttackRangeAttributeLoaded = FabricLoader.getInstance().isModLoaded("minecrawl");
 	public static final boolean isRPGInventoryLoaded = FabricLoader.getInstance().isModLoaded("rpginventory");
 	public static final boolean isShoulderSurfingLoaded = FabricLoader.getInstance().isModLoaded("shouldersurfing");
 	public static final boolean isStaminaAttributesLoaded = FabricLoader.getInstance().isModLoaded("staminaattributes");
 
 	public static RegistryEntry<EntityAttribute> ATTACK_STAMINA_COST;
+
+	public static double getAttackRange(PlayerEntity playerEntity) {
+		if (isAttackRangeAttributeLoaded && SERVER_CONFIG.enable_attack_range_attribute_integration.get()) {
+			return AttackRangeAttributeCompat.getAttackRange(playerEntity);
+		} else {
+			return playerEntity.getEntityInteractionRange();
+		}
+	}
+
+	public static RegistryEntry<EntityAttribute> getAttackRangeAttribute() {
+		if (isAttackRangeAttributeLoaded && SERVER_CONFIG.enable_attack_range_attribute_integration.get()) {
+			return AttackRangeAttributeCompat.getAttackRangeAttribute();
+		} else {
+			return EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE;
+		}
+	}
+
+	public static double getAttackRangeBaseValue(PlayerEntity playerEntity) {
+		if (isAttackRangeAttributeLoaded && SERVER_CONFIG.enable_attack_range_attribute_integration.get()) {
+			return AttackRangeAttributeCompat.getAttackRangeBaseValue(playerEntity);
+		} else {
+			return playerEntity.getAttributeBaseValue(EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE);
+		}
+	}
 
 	public static boolean isRPGInventoryHandSlotOverhaulActive() {
 		if (isRPGInventoryLoaded) {
