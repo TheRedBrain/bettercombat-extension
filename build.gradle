@@ -46,9 +46,7 @@ repositories {
 	}
 
 	// Mixin Squared
-	maven {
-		url 'https://jitpack.io'
-	}
+	maven { url = "https://maven.bawnorton.com/releases" }
 
 	// Shoulder Surfing Reloaded
 	maven {
@@ -102,7 +100,7 @@ dependencies {
 	modImplementation(files("libs/attack-range-attribute-${project.attack_range_attribute_version}.jar"))
 
 	// Mixin Squared
-	include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.1.2-beta.4")))
+    include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.3.6-beta.1")))
 
 }
 
