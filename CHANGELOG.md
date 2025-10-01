@@ -1,3 +1,8 @@
+# 2.9.0
+
+- added optional integration for "Attack Range Attribute"
+- bumped Mixin Squared version, hopefully fixing crashes when used with Sinytra Connector
+
 # 2.8.3
 
 - now works with Better Combat version 2.2.5
