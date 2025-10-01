@@ -96,8 +96,8 @@ dependencies {
 //	modImplementation(files("libs/rpg-inventory-${project.rpg_inventory_version}.jar"))
 
 	// Attack Range Attribute
-//	modImplementation("maven.modrinth:attack-range-attribute:${project.attack_range_attribute_version}")
-	modImplementation(files("libs/attack-range-attribute-${project.attack_range_attribute_version}.jar"))
+	modImplementation("maven.modrinth:attack-range-attribute:${project.attack_range_attribute_version}")
+//	modImplementation(files("libs/attack-range-attribute-${project.attack_range_attribute_version}.jar"))
 
 	// Mixin Squared
     include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.3.6-beta.1")))
@@ -164,6 +164,7 @@ if(project.hasProperty('release_type')) {
 				requiredDependency 'forgified-fabric-api'
 				requiredDependency 'sinytra-connector'
 				requiredDependency 'connector-extras'
+				optionalDependency 'attack-range-attribute'
 				optionalDependency 'shoulder-surfing-reloaded'
 				optionalDependency 'stamina-attributes'
 				optionalDependency 'rpg-inventory'
@@ -196,6 +197,7 @@ if(project.hasProperty('release_type')) {
 			required.project 'fabric-api'
 			required.project 'fzzy-config'
 			required.project 'better-combat'
+			optional.project 'attack-range-attribute'
 			optional.project 'shoulder-surfing-reloaded'
 			optional.project 'stamina-attributes'
 			optional.project 'rpg-inventory'

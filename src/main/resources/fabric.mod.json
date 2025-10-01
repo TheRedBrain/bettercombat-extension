@@ -35,6 +35,7 @@
 		"bettercombat": "${better_combat_version}"
 	},
 	"suggests": {
+		"attackrangeattribute": "*",
 		"rpginventory": "*",
 		"shouldersurfing": "*",
 		"staminaattributes": "*"
