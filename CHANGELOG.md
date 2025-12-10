@@ -1,3 +1,8 @@
+# 2.10.0
+
+- now works with Better Combat version 2.3.0
+- removed attack specific attack range and movement speed multipliers (these features are now included in Better Combat)
+
 # 2.9.0
 
 - added optional integration for "Attack Range Attribute"

@@ -8,9 +8,7 @@ It adds several new features and settings which are all controlled from the serv
 'two_handed_pose', this has no effect when the 'two_handed' field is set to true
 
 Each attack element has new optional fields:
-- 'attack_range_multiplier', multiplies the attack range during the attack
 - 'attack_speed_multiplier', multiplies the attack speed during the attack
-- 'movement_speed_multiplier', multiplies the movement speed during the attack
 - 'stamina_cost_multiplier', multiplies the stamina cost set by the 'attack_stamina_cost' attribute
 - 'damage_type': when this is a valid identifier for a damage type, the attack deals damage using that damage type
 
@@ -26,9 +24,7 @@ This is an example weapon_attribute file where all added values are present (wit
 		"two_handed_pose": "",
 		"attacks": [
 			{
-				"attack_range_multiplier": 1.0, 
                 "attack_speed_multiplier": 1.0,
-                "movement_speed_multiplier": 1.0,
 				"stamina_cost_multiplier": 1.0,
 				"damage_type": ""
 			}
