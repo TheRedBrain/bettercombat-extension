@@ -18,11 +18,13 @@ import net.bettercombat.client.BetterCombatClientMod;
 import net.bettercombat.client.Keybindings;
 import net.bettercombat.client.animation.PlayerAttackAnimatable;
 import net.bettercombat.client.collision.TargetFinder;
+import net.bettercombat.client.particle.SlashParticleUtil;
 import net.bettercombat.config.ClientConfigWrapper;
 import net.bettercombat.logic.AnimatedHand;
 import net.bettercombat.logic.PlayerAttackHelper;
 import net.bettercombat.logic.PlayerAttackProperties;
 import net.bettercombat.logic.WeaponRegistry;
+import net.bettercombat.logic.WeaponSwing;
 import net.bettercombat.mixin.client.MinecraftClientAccessor;
 import net.bettercombat.network.Packets;
 import net.bettercombat.utils.PatternMatching;
@@ -52,7 +54,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Iterator;
 import java.util.List;
 
 @Mixin({MinecraftClient.class})
@@ -78,8 +79,9 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	private ItemStack upswingStack;
 	@Unique
 	private ItemStack lastAttacedWithItemStack;
-	@Unique
-	private int upswingTicks = 0;
+	//	@Unique
+//	private int upswingTicks = 0;
+	private WeaponSwing ongoingSwing;
 	@Unique
 	private int lastAttacked = 1000;
 	@Unique
@@ -171,7 +173,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 			AttackHand hand = this.getCurrentHand();
 			if (hand != null) {
 				double upswingRate = hand.upswingRate();
-				if (this.upswingTicks > 0 || (double) this.player.getAttackCooldownProgress(0.0F) < 1.0 - upswingRate) {
+				if (currentUpswingTicks() > 0 || (double) this.player.getAttackCooldownProgress(0.0F) < 1.0 - upswingRate) {
 					ci.cancel();
 				}
 
@@ -235,38 +237,77 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	}
 
 	@Unique
-	private void startUpswing(WeaponAttributes attributes) {
-		if (!this.player.isRiding()) {
-			AttackHand hand = this.getCurrentHand();
-			if (hand != null) {
-				float upswingRate = (float) hand.upswingRate();
-				if (this.upswingTicks <= 0 && this.attackCooldown <= 0 && !this.player.isUsingItem() && !((double) this.player.getAttackCooldownProgress(0.0F) < 1.0 - (double) upswingRate)) {
-					if (BetterCombatExtension.isStaminaAttributesLoaded && ((DuckWeaponAttributesAttackMixin) (Object) hand.attack()).bettercombatextension$getStaminaCostMultiplier() > 0.0F && ((DuckLivingEntityMixin) player).bettercombatextension$getAttackStaminaCost() > 0.0F && BetterCombatExtension.getCurrentStamina(this.player)/* * BetterCombatExtension.serverConfig.global_attack_stamina_cost_multiplier*/ <= 0.0F && !this.player.isCreative()) {
-						this.player.sendMessage(Text.translatable("hud.message.staminaTooLow"), true);
-						return;
-					}
-					this.player.stopUsingItem();
-					this.lastAttacked = 0;
-					this.upswingStack = this.player.getMainHandStack();
-					float attackCooldownTicksFloat = PlayerAttackHelper.getAttackCooldownTicksCapped(this.player);
-					int attackCooldownTicks = Math.round(attackCooldownTicksFloat);
-					this.comboReset = Math.round(attackCooldownTicksFloat * BetterCombatMod.config.combo_reset_rate);
-					this.upswingTicks = Math.max(Math.round(attackCooldownTicksFloat * upswingRate), 1);
-					this.lastSwingDuration = attackCooldownTicksFloat;
-					this.itemUseCooldown = attackCooldownTicks;
-					this.setMiningCooldown(attackCooldownTicks);
-					String animationName = hand.attack().animation();
-					boolean isOffHand = hand.isOffHand();
-					AnimatedHand animatedHand = AnimatedHand.from(isOffHand, attributes.isTwoHanded());
-					((PlayerAttackAnimatable) this.player).playAttackAnimation(animationName, animatedHand, attackCooldownTicksFloat, upswingRate);
-					Packets.AttackAnimation packet = new Packets.AttackAnimation(this.player.getId(), animatedHand, animationName, attackCooldownTicksFloat, upswingRate);
-					Platform.networkC2S_Send(packet);
-					BetterCombatClientEvents.ATTACK_START.invoke((handler) -> {
-						handler.onPlayerAttackStart(this.player, hand);
-					});
-				}
-			}
+	private int currentTime() {
+		if (player == null) {
+			return 0;
 		}
+		return player.age;
+	}
+
+	@Unique
+	private int currentUpswingTicks() {
+		if (ongoingSwing == null) {
+			return 0;
+		}
+		return ongoingSwing.upswingTicksLeft(currentTime());
+	}
+
+	@Unique
+	private void startUpswing(WeaponAttributes attributes) {
+		if (this.player.isRiding()) {
+			// isRiding is `isHandsBusy()` according to official mappings
+			// Support for revival mod
+			return;
+		}
+
+		AttackHand attackHand = this.getCurrentHand();
+		if (attackHand == null) {
+			return;
+		}
+
+		float upswingRate = (float) attackHand.upswingRate();
+		if (currentUpswingTicks() > 0
+				|| attackCooldown > 0
+				|| player.isUsingItem()
+				|| player.getAttackCooldownProgress(0) < (1.0 - upswingRate)) {
+			return;
+		}
+
+		if (BetterCombatExtension.isStaminaAttributesLoaded && ((DuckWeaponAttributesAttackMixin) (Object) attackHand.attack()).bettercombatextension$getStaminaCostMultiplier() > 0.0F && ((DuckLivingEntityMixin) player).bettercombatextension$getAttackStaminaCost() > 0.0F && BetterCombatExtension.getCurrentStamina(this.player)/* * BetterCombatExtension.serverConfig.global_attack_stamina_cost_multiplier*/ <= 0.0F && !this.player.isCreative()) {
+			this.player.sendMessage(Text.translatable("hud.message.staminaTooLow"), true);
+			return;
+		}
+
+		// Starting upswing
+		this.player.stopUsingItem();
+
+		this.lastAttacked = 0;
+		this.upswingStack = this.player.getMainHandStack();
+		float attackCooldownTicksFloat = PlayerAttackHelper.getAttackCooldownTicksCapped(this.player);
+		int attackCooldownTicks = Math.round(attackCooldownTicksFloat);
+		this.comboReset = Math.round(attackCooldownTicksFloat * BetterCombatMod.config.combo_reset_rate);
+		int upswingTicks = Math.max(Math.round(attackCooldownTicksFloat * upswingRate), 1); // At least 1 upswing ticks
+		this.ongoingSwing = new WeaponSwing(attackHand, currentTime(), upswingTicks, attackCooldownTicksFloat);
+		this.lastSwingDuration = attackCooldownTicksFloat;
+		this.itemUseCooldown = attackCooldownTicks;
+		this.setMiningCooldown(attackCooldownTicks);
+		String animationName = attackHand.attack().animation();
+		boolean isOffHand = attackHand.isOffHand();
+		AnimatedHand animatedHand = AnimatedHand.from(isOffHand, attributes.isTwoHanded());
+		((PlayerAttackAnimatable) this.player).playAttackAnimation(animationName, animatedHand, attackCooldownTicksFloat, upswingRate);
+
+		var particles = SlashParticleUtil.trailParticlesFromAttack(attackHand);
+		var appearance = SlashParticleUtil.appearanceFromItemStack(attackHand.itemStack());
+		var packet = new Packets.AttackAnimation(
+				player.getId(), animatedHand, animationName, attackCooldownTicksFloat, upswingRate,
+				(float) PlayerAttackHelper.getStaticRange(player, attackHand.itemStack()),
+				upswingTicks,
+				new Packets.SwingParticles(particles, appearance)
+		);
+		Platform.networkC2S_Send(packet);
+		BetterCombatClientEvents.ATTACK_START.invoke((handler) -> {
+			handler.onPlayerAttackStart(this.player, attackHand);
+		});
 	}
 
 	@Unique
@@ -278,14 +319,10 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 
 	@Unique
 	private void attackFromUpswingIfNeeded() {
-		if (this.upswingTicks > 0) {
-			--this.upswingTicks;
-			if (this.upswingTicks == 0) {
-				this.performAttack();
-				this.upswingStack = null;
-			}
+		if (ongoingSwing != null && currentUpswingTicks() == 0) {
+			this.performAttack();
+			this.upswingStack = null;
 		}
-
 	}
 
 	@Unique
@@ -337,14 +374,21 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 			at = {@At("HEAD")}
 	)
 	private void pre_Tick(CallbackInfo ci) {
-		if (this.player != null) {
-			this.targetsInReach = null;
-			++this.lastAttacked;
-			this.cancelSwingIfNeeded();
-			this.attackFromUpswingIfNeeded();
-			this.updateTargetsIfNeeded();
-			this.resetComboIfNeeded();
+		if (this.player == null) {
+			return;
 		}
+		this.targetsInReach = null;
+		this.lastAttacked += 1;
+
+		if (ongoingSwing != null) {
+			if (ongoingSwing.ticksLeft(currentTime()) <= 0) {
+				ongoingSwing = null;
+			}
+		}
+		this.cancelSwingIfNeeded();
+		this.attackFromUpswingIfNeeded();
+		this.updateTargetsIfNeeded();
+		this.resetComboIfNeeded();
 	}
 
 	@Inject(
@@ -352,75 +396,86 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 			at = {@At("TAIL")}
 	)
 	private void post_Tick(CallbackInfo ci) {
-		if (this.player != null) {
-			if (Keybindings.toggleMineKeyBinding.wasPressed()) {
-				BetterCombatClientMod.config.isMiningWithWeaponsEnabled = !BetterCombatClientMod.config.isMiningWithWeaponsEnabled;
-				AutoConfig.getConfigHolder(ClientConfigWrapper.class).save();
-				String message = I18n.translate(BetterCombatClientMod.config.isMiningWithWeaponsEnabled ? "hud.bettercombat.mine_with_weapons_on" : "hud.bettercombat.mine_with_weapons_off", new Object[0]);
-				this.inGameHud.setOverlayMessage(Text.literal(message), false);
-			}
+		if (this.player == null) {
+			return;
+		}
+		if (Keybindings.toggleMineKeyBinding.wasPressed()) {
+			BetterCombatClientMod.config.isMiningWithWeaponsEnabled = !BetterCombatClientMod.config.isMiningWithWeaponsEnabled;
+			AutoConfig.getConfigHolder(ClientConfigWrapper.class).save();
+			String message = I18n.translate(BetterCombatClientMod.config.isMiningWithWeaponsEnabled ? "hud.bettercombat.mine_with_weapons_on" : "hud.bettercombat.mine_with_weapons_off", new Object[0]);
+			this.inGameHud.setOverlayMessage(Text.literal(message), false);
 		}
 	}
 
 	@Unique
 	private void performAttack() {
 		ServerConfig serverConfig = BetterCombatExtension.SERVER_CONFIG;
-		if (this.player != null) {
-			if (Keybindings.feintKeyBinding.isPressed()) {
-				this.player.resetLastAttackedTicks();
-				this.cancelWeaponSwing();
-				AttackHand hand = this.getCurrentHand();
-				if (hand != null && BetterCombatExtension.isStaminaAttributesLoaded) {
-					ClientPlayNetworking.send(new AttackStaminaCostPacket(((DuckLivingEntityMixin) this.player).bettercombatextension$getAttackStaminaCost() * ((DuckWeaponAttributesAttackMixin) (Object) hand.attack()).bettercombatextension$getStaminaCostMultiplier() * serverConfig.global_feint_stamina_cost_multiplier.get()));
-				}
-				// feinting an attack increases combo count
-				if (serverConfig.feinting_increases_combo_count.get()) {
-					this.setComboCount(this.getComboCount() + 1);
-				}
-			} else {
-				AttackHand hand = this.getCurrentHand();
-				if (hand != null) {
-					WeaponAttributes.Attack attack = hand.attack();
-					if (BetterCombatExtension.isStaminaAttributesLoaded) {
-						ClientPlayNetworking.send(new AttackStaminaCostPacket(((DuckLivingEntityMixin) this.player).bettercombatextension$getAttackStaminaCost() * ((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$getStaminaCostMultiplier() * serverConfig.global_attack_stamina_cost_multiplier.get()));
-					}
-					double upswingRate = hand.upswingRate();
-					if (!((double) this.player.getAttackCooldownProgress(0.0F) < 1.0 - upswingRate)) {
-						Entity cursorTarget = this.getCursorTarget();
-						double range = PlayerAttackHelper.getRangeForItem(this.player, hand.itemStack());
-						List<Entity> targets = TargetFinder.findAttackTargets(this.player, cursorTarget, attack, range);
-						this.updateTargetsInReach(targets);
-						if (targets.size() == 0) {
-							PlatformClient.onEmptyLeftClick(this.player);
-							if (this.crosshairTarget.getType() == HitResult.Type.BLOCK) {
-								BlockHitResult blockHitResult = (BlockHitResult) this.crosshairTarget;
-								BlockPos pos = blockHitResult.getBlockPos();
-								Packets.C2S_BlockHit packet = new Packets.C2S_BlockHit(pos);
-								Platform.networkC2S_Send(packet);
-							}
-						}
-
-						Packets.C2S_AttackRequest packet = new Packets.C2S_AttackRequest(this.getComboCount(), this.player.isSneaking(), this.player.getInventory().selectedSlot, cursorTarget, targets);
-						Platform.networkC2S_Send(packet);
-						Iterator var8 = targets.iterator();
-
-						while (var8.hasNext()) {
-							Entity target = (Entity) var8.next();
-							this.player.attack(target);
-						}
-
-						this.player.resetLastAttackedTicks();
-						BetterCombatClientEvents.ATTACK_HIT.invoke((handler) -> {
-							handler.onPlayerAttackStart(this.player, hand, targets, cursorTarget);
-						});
-						this.setComboCount(this.getComboCount() + 1);
-						if (!hand.isOffHand()) {
-							this.lastAttacedWithItemStack = hand.itemStack();
-						}
-
-					}
-				}
+		if (this.player == null) {
+			return;
+		}
+		if (Keybindings.feintKeyBinding.isPressed()) {
+			this.player.resetLastAttackedTicks();
+			this.cancelWeaponSwing();
+			AttackHand hand = this.getCurrentHand();
+			if (hand != null && BetterCombatExtension.isStaminaAttributesLoaded) {
+				ClientPlayNetworking.send(new AttackStaminaCostPacket(((DuckLivingEntityMixin) this.player).bettercombatextension$getAttackStaminaCost() * ((DuckWeaponAttributesAttackMixin) (Object) hand.attack()).bettercombatextension$getStaminaCostMultiplier() * serverConfig.global_feint_stamina_cost_multiplier.get()));
 			}
+			// feinting an attack increases combo count
+			if (serverConfig.feinting_increases_combo_count.get()) {
+				this.setComboCount(this.getComboCount() + 1);
+			}
+			return;
+		}
+		AttackHand hand = this.getCurrentHand();
+		if (hand == null) {
+			return;
+		}
+		WeaponAttributes.Attack attack = hand.attack();
+		if (BetterCombatExtension.isStaminaAttributesLoaded) {
+			ClientPlayNetworking.send(new AttackStaminaCostPacket(((DuckLivingEntityMixin) this.player).bettercombatextension$getAttackStaminaCost() * ((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$getStaminaCostMultiplier() * serverConfig.global_attack_stamina_cost_multiplier.get()));
+		}
+		double upswingRate = hand.upswingRate();
+		if (((double) this.player.getAttackCooldownProgress(0.0F) < 1.0 - upswingRate)) {
+			return;
+		}
+		Entity cursorTarget = this.getCursorTarget();
+		double range = PlayerAttackHelper.getRangeForItem(this.player, hand.itemStack());
+		range *= hand.attack().rangeMultiplier();
+		List<Entity> targets = TargetFinder.findAttackTargets(
+				this.player,
+				cursorTarget,
+				attack,
+				range
+		);
+		this.updateTargetsInReach(targets);
+		if (targets.size() == 0) {
+			PlatformClient.onEmptyLeftClick(this.player);
+			if (this.crosshairTarget.getType() == HitResult.Type.BLOCK) {
+				BlockHitResult blockHitResult = (BlockHitResult) this.crosshairTarget;
+				BlockPos pos = blockHitResult.getBlockPos();
+				Packets.C2S_BlockHit packet = new Packets.C2S_BlockHit(pos);
+				Platform.networkC2S_Send(packet);
+			}
+		}
+
+		Packets.C2S_AttackRequest packet = new Packets.C2S_AttackRequest(this.getComboCount(), this.player.isSneaking(), this.player.getInventory().selectedSlot, cursorTarget, targets);
+		Platform.networkC2S_Send(packet);
+		for (var target : targets) {
+			player.attack(target);
+		}
+
+		this.player.resetLastAttackedTicks();
+		BetterCombatClientEvents.ATTACK_HIT.invoke((handler) -> {
+			handler.onPlayerAttackStart(this.player, hand, targets, cursorTarget);
+		});
+
+		var particles = SlashParticleUtil.trailParticlesFromAttack(hand);
+		var appearance = SlashParticleUtil.appearanceFromItemStack(hand.itemStack());
+		SlashParticleUtil.spawnParticles(player, hand.isOffHand(), (float) PlayerAttackHelper.getStaticRange(player, hand.itemStack()), particles, appearance);
+
+		this.setComboCount(this.getComboCount() + 1);
+		if (!hand.isOffHand()) {
+			this.lastAttacedWithItemStack = hand.itemStack();
 		}
 	}
 
@@ -478,13 +533,20 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	}
 
 	public int getUpswingTicks() {
-		return this.upswingTicks;
+		return currentUpswingTicks();
 	}
 
 	public void cancelUpswing() {
-		if (this.upswingTicks > 0) {
+		if (currentUpswingTicks() > 0) {
 			this.cancelWeaponSwing();
 		}
+	}
 
+	@Override
+	public AttackHand getCurrentAttackHand() {
+		if (this.ongoingSwing != null) {
+			return this.ongoingSwing.attackHand();
+		}
+		return null;
 	}
 }

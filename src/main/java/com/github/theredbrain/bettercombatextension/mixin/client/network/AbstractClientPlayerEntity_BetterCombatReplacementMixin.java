@@ -21,6 +21,8 @@ import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import net.bettercombat.BetterCombatMod;
 import net.bettercombat.Platform;
 import net.bettercombat.api.WeaponAttributes;
+import net.bettercombat.api.fx.ParticlePlacement;
+import net.bettercombat.api.fx.TrailAppearance;
 import net.bettercombat.client.BetterCombatClientMod;
 import net.bettercombat.client.animation.AttackAnimationSubStack;
 import net.bettercombat.client.animation.CustomAnimationPlayer;
@@ -30,6 +32,7 @@ import net.bettercombat.client.animation.StateCollectionHelper;
 import net.bettercombat.client.animation.modifier.HarshAdjustmentModifier;
 import net.bettercombat.client.animation.modifier.TransmissionSpeedModifier;
 import net.bettercombat.client.compat.FirstPersonAnimationCompatibility;
+import net.bettercombat.client.particle.SlashParticleUtil;
 import net.bettercombat.logic.AnimatedHand;
 import net.bettercombat.logic.WeaponRegistry;
 import net.bettercombat.mixin.player.LivingEntityAccessor;
@@ -44,6 +47,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -91,6 +95,12 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
 		boolean hasActiveAttackAnimation = this.attackAnimation.base.getAnimation() != null && this.attackAnimation.base.getAnimation().isActive();
 		ItemStack mainHandStack = player.getMainHandStack();
 		ItemStack offHandStack = player.getOffHandStack();
+
+		if (scheduledParticles != null && scheduledParticles.time() == player.age) {
+			SlashParticleUtil.spawnParticles(scheduledParticles.args());
+			scheduledParticles = null;
+		}
+
 		if (!player.handSwinging && !player.isSwimming() && !player.isUsingItem() && (BetterCombatExtensionClient.CLIENT_CONFIG.enable_poses_while_sprinting.get() || !player.isSprinting()) && (BetterCombatExtensionClient.CLIENT_CONFIG.enable_poses_while_mounted.get() || player.getVehicle() == null) && !player.isClimbing() && !player.isFallFlying() && !Platform.isCastingSpell(player) && !CrossbowItem.isCharged(mainHandStack)) {
 			if (hasActiveAttackAnimation) {
 				((LivingEntityAccessor) player).invokeTurnHead(player.getHeadYaw(), 0.0F);
@@ -159,7 +169,25 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
 		} catch (Exception var13) {
 			var13.printStackTrace();
 		}
+	}
 
+	@Nullable
+	private SlashParticleUtil.ScheduledSpawnArgs scheduledParticles = null;
+
+	@Override
+	public void playAttackParticles(boolean isOffHand, float weaponRange, int delay, List<ParticlePlacement> particles, TrailAppearance appearance) {
+		var player = (AbstractClientPlayerEntity)(Object)this;
+		var spawn = new SlashParticleUtil.SpawnArgs(
+				player,
+				isOffHand,
+				weaponRange,
+				particles,
+				appearance
+		);
+		scheduledParticles = new SlashParticleUtil.ScheduledSpawnArgs(
+				spawn,
+				player.age + delay
+		);
 	}
 
 	@Unique
@@ -277,6 +305,7 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
 
 	public void stopAttackAnimation(float length) {
 		IAnimation currentAnimation = this.attackAnimation.base.getAnimation();
+		scheduledParticles = null;
 		if (currentAnimation != null && currentAnimation instanceof KeyframeAnimationPlayer) {
 			int fadeOut = Math.round(length);
 			this.attackAnimation.adjustmentModifier.fadeOut(fadeOut);

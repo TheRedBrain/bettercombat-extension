@@ -1,7 +1,6 @@
 package com.github.theredbrain.bettercombatextension.mixin.bettercombat.client.collision;
 
 import com.github.theredbrain.bettercombatextension.BetterCombatExtension;
-import com.github.theredbrain.bettercombatextension.bettercombat.DuckWeaponAttributesAttackMixin;
 import com.github.theredbrain.bettercombatextension.config.ServerConfig;
 import net.bettercombat.api.WeaponAttributes;
 import net.bettercombat.api.client.AttackRangeExtensions;
@@ -33,10 +32,6 @@ public abstract class TargetFinderMixin {
 	@Overwrite
 	public static TargetFinder.TargetResult findAttackTargetResult(PlayerEntity player, Entity cursorTarget, WeaponAttributes.Attack attack, double attackRange) {
 		Vec3d origin = TargetFinder.getInitialTracingPoint(player);
-
-		// apply attack specific range multipliers
-		attackRange *= ((DuckWeaponAttributesAttackMixin) (Object) attack).bettercombatextension$getAttackRangeMultiplier();
-
 		List<Entity> entities = TargetFinder.getInitialTargets(player, cursorTarget, attackRange);
 		if (!AttackRangeExtensions.sources().isEmpty()) {
 			attackRange = applyAttackRangeModifiers(player, attackRange);
@@ -48,13 +43,13 @@ public abstract class TargetFinderMixin {
 		// restrict attack pitch
 		ServerConfig serverConfig = BetterCombatExtension.SERVER_CONFIG;
 		float attackPitch = serverConfig.restrict_attack_pitch.get() ? MathHelper.clamp(player.getPitch(), -serverConfig.attack_pitch_range.get(), serverConfig.attack_pitch_range.get()) : player.getPitch();
-		OrientedBoundingBox obb = new OrientedBoundingBox(origin, size, attackPitch, player.getYaw());
 
+		OrientedBoundingBox obb = new OrientedBoundingBox(origin, size, attackPitch, player.getYaw());
 		if (!isSpinAttack) {
 			obb = obb.offsetAlongAxisZ(size.z / 2.0);
 		}
-
 		obb.updateVertex();
+
 		TargetFinder.CollisionFilter collisionFilter = new TargetFinder.CollisionFilter(obb);
 		entities = collisionFilter.filter(entities);
 		TargetFinder.RadialFilter radialFilter = new TargetFinder.RadialFilter(origin, obb.axisZ, attackRange, attack.angle());

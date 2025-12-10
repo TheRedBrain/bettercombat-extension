@@ -9,25 +9,11 @@ import org.spongepowered.asm.mixin.Unique;
 public class WeaponAttributesAttackMixin implements DuckWeaponAttributesAttackMixin {
 
 	@Unique
-	private float attack_range_multiplier = 1.0F;
-	@Unique
 	private float stamina_cost_multiplier = 1.0F;
-	@Unique
-	private float movement_speed_multiplier = 1.0F;
 	@Unique
 	private float attack_speed_multiplier = 1.0F;
 	@Unique
 	private String damage_type = "";
-
-	@Override
-	public float bettercombatextension$getAttackRangeMultiplier() {
-		return this.attack_range_multiplier;
-	}
-
-	@Override
-	public void bettercombatextension$setAttackRangeMultiplier(float attack_range_multiplier) {
-		this.attack_range_multiplier = attack_range_multiplier;
-	}
 
 	@Override
 	public float bettercombatextension$getStaminaCostMultiplier() {
@@ -37,16 +23,6 @@ public class WeaponAttributesAttackMixin implements DuckWeaponAttributesAttackMi
 	@Override
 	public void bettercombatextension$setStaminaCostMultiplier(float stamina_cost_multiplier) {
 		this.stamina_cost_multiplier = stamina_cost_multiplier;
-	}
-
-	@Override
-	public float bettercombatextension$getMovementSpeedMultiplier() {
-		return this.movement_speed_multiplier;
-	}
-
-	@Override
-	public void bettercombatextension$setMovementSpeedMultiplier(float movement_speed_multiplier) {
-		this.movement_speed_multiplier = movement_speed_multiplier;
 	}
 
 	@Override

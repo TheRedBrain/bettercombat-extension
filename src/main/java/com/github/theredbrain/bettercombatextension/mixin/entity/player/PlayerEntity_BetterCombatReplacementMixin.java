@@ -35,7 +35,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin({PlayerEntity.class})
+@Mixin(value = PlayerEntity.class, priority = 899)
 public abstract class PlayerEntity_BetterCombatReplacementMixin implements PlayerAttackProperties, EntityPlayer_BetterCombat {
 	private int comboCount = 0;
 
