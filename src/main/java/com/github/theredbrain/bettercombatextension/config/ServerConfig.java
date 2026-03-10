@@ -21,6 +21,8 @@ public class ServerConfig extends Config {
 			Default: false
 			""")
 	public ValidatedBoolean enable_movement_locking_attacks = new ValidatedBoolean(false);
+	public ValidatedBoolean movement_locking_prevents_player_position_changes = new ValidatedBoolean(true);
+	public ValidatedBoolean movement_locking_prevents_player_orientation_changes = new ValidatedBoolean(true);
 	@Comment("""
 			When set to true, jumping is disabled during attacks.
 			Use the item tag "disables_jump_restriction_during_attack" and the entity type tag "disables_jump_restriction_when_ridden" to control when the jump restriction is applied.

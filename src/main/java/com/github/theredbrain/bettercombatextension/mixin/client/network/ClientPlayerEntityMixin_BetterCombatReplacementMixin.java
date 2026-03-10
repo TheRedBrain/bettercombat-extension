@@ -100,7 +100,7 @@ public abstract class ClientPlayerEntityMixin_BetterCombatReplacementMixin exten
 			}
 		}
 		boolean isMovementLockingDisabled = activeItemStack.isIn(BetterCombatExtension.DISABLES_MOVEMENT_LOCKING_DURING_ATTACK);
-		if (betterCombatExtensionServerConfig.enable_movement_locking_attacks.get() && !isMovementLockingDisabled && isWeaponSwingInProgress) {
+		if (betterCombatExtensionServerConfig.enable_movement_locking_attacks.get() && betterCombatExtensionServerConfig.movement_locking_prevents_player_position_changes.get() && !isMovementLockingDisabled && isWeaponSwingInProgress) {
 			boolean isVehicleDisablingMovementLocking = clientPlayer.getVehicle() != null && clientPlayer.getVehicle().getType().isIn(BetterCombatExtension.DISABLES_MOVEMENT_LOCKING_WHEN_RIDDEN);
 			if (!clientPlayer.hasVehicle() || !isVehicleDisablingMovementLocking) {
 				clientPlayer.input.movementForward = 0.0F;
