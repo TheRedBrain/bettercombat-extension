@@ -184,38 +184,45 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	@Unique
 	private boolean isTargetingMineableBlock() {
 		if (!BetterCombatClientMod.config.isMiningWithWeaponsEnabled) {
-			return false;
-		} else {
-			String regex = BetterCombatClientMod.config.mineWithWeaponBlacklist;
-			if (regex != null && !regex.isEmpty()) {
-				ItemStack itemStack = this.player.getMainHandStack();
-				String id = Registries.ITEM.getId(itemStack.getItem()).toString();
-				if (PatternMatching.matches(id, regex)) {
-					return false;
-				}
-			}
-
-			if (BetterCombatClientMod.config.isAttackInsteadOfMineWhenEnemiesCloseEnabled && this.hasTargetsInReach()) {
+			var whitelist = BetterCombatClientMod.config.mineWithWeaponWhitelist;
+			if (whitelist == null || whitelist.isEmpty()) {
 				return false;
-			} else {
-				MinecraftClient client = this.thisClient();
-				HitResult crosshairTarget = client.crosshairTarget;
-				if (crosshairTarget != null && crosshairTarget.getType() == HitResult.Type.BLOCK) {
-					BlockHitResult blockHitResult = (BlockHitResult) crosshairTarget;
-					BlockPos pos = blockHitResult.getBlockPos();
-					BlockState clicked = this.world.getBlockState(pos);
-					if (!this.shouldSwingThruGrass()) {
-						return true;
-					}
-
-					if (!clicked.getCollisionShape(this.world, pos).isEmpty() || clicked.getHardness(this.world, pos) != 0.0F) {
-						return true;
-					}
-				}
-
+			}
+			var itemStack = player.getMainHandStack();
+			var id = Registries.ITEM.getId(itemStack.getItem()).toString();
+			if (!PatternMatching.matches(id, whitelist)) {
+				return false;
+			}
+			// Weapon is whitelisted — fall through to continue checks
+		}
+		String regex = BetterCombatClientMod.config.mineWithWeaponBlacklist;
+		if (regex != null && !regex.isEmpty()) {
+			ItemStack itemStack = this.player.getMainHandStack();
+			String id = Registries.ITEM.getId(itemStack.getItem()).toString();
+			if (PatternMatching.matches(id, regex)) {
 				return false;
 			}
 		}
+
+		if (BetterCombatClientMod.config.isAttackInsteadOfMineWhenEnemiesCloseEnabled && this.hasTargetsInReach()) {
+			return false;
+		}
+		MinecraftClient client = this.thisClient();
+		HitResult crosshairTarget = client.crosshairTarget;
+		if (crosshairTarget != null && crosshairTarget.getType() == HitResult.Type.BLOCK) {
+			BlockHitResult blockHitResult = (BlockHitResult) crosshairTarget;
+			BlockPos pos = blockHitResult.getBlockPos();
+			BlockState clicked = this.world.getBlockState(pos);
+			if (!this.shouldSwingThruGrass()) {
+				return true;
+			}
+
+			if (!clicked.getCollisionShape(this.world, pos).isEmpty() || clicked.getHardness(this.world, pos) != 0.0F) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Unique
@@ -382,7 +389,14 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 
 		if (ongoingSwing != null) {
 			if (ongoingSwing.ticksLeft(currentTime()) <= 0) {
-				ongoingSwing = null;
+				var time = currentTime();
+				var swing = ongoingSwing; // Store in local for further checks
+				if (swing.ticksLeft(time) <= 0) {
+					ongoingSwing = null;
+				}
+				if (!player.isAlive() || !swing.isValid(time)) {
+					cancelWeaponSwing();
+				}
 			}
 		}
 		this.cancelSwingIfNeeded();

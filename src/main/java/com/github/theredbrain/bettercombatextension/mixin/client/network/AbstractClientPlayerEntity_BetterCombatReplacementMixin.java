@@ -158,7 +158,8 @@ public abstract class AbstractClientPlayerEntity_BetterCombatReplacementMixin ex
 			}
 
 			int fadeIn = copy.beginTick;
-			float upswingSpeed = speed / BetterCombatMod.config.getUpswingMultiplier();
+			float trueUpswingRatio = upswing / BetterCombatMod.config.getUpswingMultiplier();
+			float upswingSpeed = speed / trueUpswingRatio;
 			float downwindSpeed = (float) ((double) speed * MathHelper.lerp(Math.max((double) BetterCombatMod.config.getUpswingMultiplier() - 0.5, 0.0) / 0.5, (double) (1.0F - upswing), (double) (upswing / (1.0F - upswing))));
 			this.attackAnimation.speed.set(upswingSpeed, List.of(new TransmissionSpeedModifier.Gear(length * upswing, downwindSpeed), new TransmissionSpeedModifier.Gear(length, speed)));
 			this.attackAnimation.mirror.setEnabled(mirror);
