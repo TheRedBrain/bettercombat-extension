@@ -49,7 +49,9 @@ Setting this option to false will disable the RPG Inventory hand slot overhaul. 
 ### Movement Locking Attacks
 
 Setting the "enable_movement_locking_attacks" setting in the server config to true, enables movement locking attacks.
-This prevents the player from changing its orientation and position while a attack animation is active.
+This prevents the player from changing its orientation and position while an attack animation is active.
+
+By default, movement locking prevents both position and orientation changes. These can be individually disabled in the server config.
 
 It is recommended to use the client-side mod [Shoulder Surfing Reloaded](https://modrinth.com/mod/shoulder-surfing-reloaded) and enable its "decoupled camera" setting when this setting is active.
 

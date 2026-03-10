@@ -1,5 +1,7 @@
 # 2.11.0
 
+now works with Better Combat 2.3.2
+
 ## Additions
 
 - added server config options to individually toggle position and orientation locking for movement locking attacks
