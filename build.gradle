@@ -13,10 +13,14 @@ base {
 }
 
 repositories {
-	// Fzzy Config
+
+	// Better Combat, Stamina Attributes
 	maven {
-		name = "FzzyMaven"
-		url = "https://maven.fzzyhmstrs.me/"
+		name = "Modrinth"
+		url = "https://api.modrinth.com/maven"
+		content {
+			includeGroup "maven.modrinth"
+		}
 	}
 
 	// Cloth Config
@@ -30,13 +34,10 @@ repositories {
 		url = "https://maven.terraformersmc.com/"
 	}
 
-	// Better Combat, Stamina Attributes
+	// Fzzy Config
 	maven {
-		name = "Modrinth"
-		url = "https://api.modrinth.com/maven"
-		content {
-			includeGroup "maven.modrinth"
-		}
+		name = "FzzyMaven"
+		url = "https://maven.fzzyhmstrs.me/"
 	}
 
 	// Player Animator
@@ -140,45 +141,45 @@ ext.changelog_last_section = { ->
 if(project.hasProperty('release_type')) {
 	tasks.register("publishMod") {
 		dependsOn(build)
-		finalizedBy(tasks.curseforge)
+//		finalizedBy(tasks.curseforge)
 		finalizedBy(tasks.modrinth)
 		finalizedBy(tasks.githubRelease)
 	}
 
-	curseforge {
-		apiKey = System.getenv("CURSEFORGE_API_KEY")
-		project {
-			id = System.getenv("CURSEFORGE_PROJECT_ID")
-			changelog = changelog_last_section()
-			changelogType = 'markdown'
-			releaseType = release_type
-			addGameVersion "${project.minecraft_version}"
-			addGameVersion "${project.minecraft_version_compat}"
-			addGameVersion "Fabric"
-			addGameVersion "NeoForge"
-
-			relations {
-				requiredDependency 'fabric-api'
-				requiredDependency 'fzzy-config'
-				requiredDependency 'better-combat-by-daedelus'
-				requiredDependency 'forgified-fabric-api'
-				requiredDependency 'sinytra-connector'
-				requiredDependency 'connector-extras'
-				optionalDependency 'attack-range-attribute'
-				optionalDependency 'shoulder-surfing-reloaded'
-				optionalDependency 'stamina-attributes'
-				optionalDependency 'rpg-inventory'
-			}
-
-			mainArtifact(remapJar)
-			afterEvaluate {
-				uploadTask.dependsOn(remapJar)
-			}
-			options {
-				forgeGradleIntegration = false
-			}
-		}
-	}
+//	curseforge {
+//		apiKey = System.getenv("CURSEFORGE_API_KEY")
+//		project {
+//			id = System.getenv("CURSEFORGE_PROJECT_ID")
+//			changelog = changelog_last_section()
+//			changelogType = 'markdown'
+//			releaseType = release_type
+//			addGameVersion "${project.minecraft_version}"
+//			addGameVersion "${project.minecraft_version_compat}"
+//			addGameVersion "Fabric"
+//			addGameVersion "NeoForge"
+//
+//			relations {
+//				requiredDependency 'fabric-api'
+//				requiredDependency 'fzzy-config'
+//				requiredDependency 'better-combat-by-daedelus'
+//				requiredDependency 'forgified-fabric-api'
+//				requiredDependency 'sinytra-connector'
+//				requiredDependency 'connector-extras'
+//				optionalDependency 'attack-range-attribute'
+//				optionalDependency 'shoulder-surfing-reloaded'
+//				optionalDependency 'stamina-attributes'
+//				optionalDependency 'rpg-inventory'
+//			}
+//
+//			mainArtifact(remapJar)
+//			afterEvaluate {
+//				uploadTask.dependsOn(remapJar)
+//			}
+//			options {
+//				forgeGradleIntegration = false
+//			}
+//		}
+//	}
 
 	modrinth {
 		token = System.getenv("MODRINTH_API_KEY")
