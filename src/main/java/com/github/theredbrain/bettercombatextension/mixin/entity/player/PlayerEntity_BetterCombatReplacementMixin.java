@@ -5,6 +5,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.bettercombat.BetterCombatMod;
 import net.bettercombat.api.AttackHand;
+import net.bettercombat.api.CombatFlags;
 import net.bettercombat.api.EntityPlayer_BetterCombat;
 import net.bettercombat.api.WeaponAttributes;
 import net.bettercombat.client.animation.PlayerAttackAnimatable;
@@ -37,10 +38,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = PlayerEntity.class, priority = 899)
 public abstract class PlayerEntity_BetterCombatReplacementMixin implements PlayerAttackProperties, EntityPlayer_BetterCombat {
+	@Unique
 	private int comboCount = 0;
-
+	@Unique
 	private static final TrackedData<String> BETTER_COMBAT_MAIN_IDLE_ANIMATION = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlerRegistry.STRING);
+	@Unique
 	private static final TrackedData<String> BETTER_COMBAT_OFF_IDLE_ANIMATION = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlerRegistry.STRING);
+	/*
+	 * Per-player combat flags, see `CombatFlags` for the public API.
+	 *   Bit 0 (0b00000001) TAG_DISABLED - attacks disabled, mirror of the `bettercombat_disabled` command tag, written only by `updateCombatFlagsFromCommandTags`
+	 *   Bit 1 (0b00000010) API_DISABLED - attacks disabled by a mod, written only via `CombatFlags.setAttacksDisabled`
+	 *   Bit 2 (0b00000100) unused, reserved for future flags (pose suppression, HUD)
+	 *   Bit 3 (0b00001000) unused
+	 *   Bit 4 (0b00010000) unused
+	 *   Bit 5 (0b00100000) unused
+	 *   Bit 6 (0b01000000) unused
+	 *   Bit 7 (0b10000000) unused
+	 */
+	@Unique
+	private static final TrackedData<Byte> BETTER_COMBAT_FLAGS = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlerRegistry.BYTE);
 
 	public PlayerEntity_BetterCombatReplacementMixin() {
 	}
@@ -57,6 +73,7 @@ public abstract class PlayerEntity_BetterCombatReplacementMixin implements Playe
 	private void initDataTracker_TAIL_SpellEngine_SyncEffects(DataTracker.Builder builder, CallbackInfo ci) {
 		builder.add(BETTER_COMBAT_MAIN_IDLE_ANIMATION, "");
 		builder.add(BETTER_COMBAT_OFF_IDLE_ANIMATION, "");
+		builder.add(BETTER_COMBAT_FLAGS, (byte) 0);
 	}
 
 	@Inject(
@@ -73,10 +90,34 @@ public abstract class PlayerEntity_BetterCombatReplacementMixin implements Playe
 			var pose = PlayerAttackHelper.poseForPlayer(player);
 			player.getDataTracker().set(BETTER_COMBAT_MAIN_IDLE_ANIMATION, pose.base());
 			player.getDataTracker().set(BETTER_COMBAT_OFF_IDLE_ANIMATION, pose.offHand());
+			updateCombatFlagsFromCommandTags(player);
 		}
 
 		this.updateDualWieldingSpeedBoost();
 		this.updateAttackSpecificSpeedBoost();
+	}
+
+	// FEATURE: Per-player disable via vanilla command tag
+	// Tags have no change event, and NBT loading bypasses addCommandTag/removeCommandTag,
+	// so the tag is polled every tick. Diffing self-heals join, NBT load and respawn.
+	@Unique
+	private void updateCombatFlagsFromCommandTags(PlayerEntity player) {
+		var tagged = player.getCommandTags().contains(CombatFlags.DISABLED_TAG);
+		var flags = getCombatFlags();
+		var mirrored = (flags & CombatFlags.TAG_DISABLED) != 0;
+		if (tagged != mirrored) {
+			setCombatFlags((byte) (tagged
+					? flags | CombatFlags.TAG_DISABLED
+					: flags & ~CombatFlags.TAG_DISABLED));
+		}
+	}
+
+	public byte getCombatFlags() {
+		return ((PlayerEntity) ((Object)this)).getDataTracker().get(BETTER_COMBAT_FLAGS);
+	}
+
+	public void setCombatFlags(byte flags) {
+		((PlayerEntity) ((Object)this)).getDataTracker().set(BETTER_COMBAT_FLAGS, flags);
 	}
 
 	public String getMainHandIdleAnimation() {

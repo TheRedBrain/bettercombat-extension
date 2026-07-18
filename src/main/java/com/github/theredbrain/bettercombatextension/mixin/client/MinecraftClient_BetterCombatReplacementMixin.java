@@ -11,6 +11,7 @@ import net.bettercombat.BetterCombatMod;
 import net.bettercombat.Platform;
 import net.bettercombat.PlatformClient;
 import net.bettercombat.api.AttackHand;
+import net.bettercombat.api.CombatFlags;
 import net.bettercombat.api.MinecraftClient_BetterCombat;
 import net.bettercombat.api.WeaponAttributes;
 import net.bettercombat.api.client.BetterCombatClientEvents;
@@ -79,8 +80,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 	private ItemStack upswingStack;
 	@Unique
 	private ItemStack lastAttacedWithItemStack;
-	//	@Unique
-//	private int upswingTicks = 0;
+	@Unique
 	private WeaponSwing ongoingSwing;
 	@Unique
 	private int lastAttacked = 1000;
@@ -113,20 +113,24 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 			cancellable = true
 	)
 	private void pre_doAttack(CallbackInfoReturnable<Boolean> info) {
-		if (BetterCombatClientMod.ENABLED) {
-			MinecraftClient client = this.thisClient();
-			WeaponAttributes attributes = WeaponRegistry.getAttributes(client.player.getMainHandStack());
-			if (attributes != null && attributes.attacks() != null) {
-				if (this.isTargetingMineableBlock() || this.isHarvesting) {
-					this.isHarvesting = true;
-					return;
-				}
+		if (!BetterCombatClientMod.ENABLED) {
+			return;
+		}
+		if (CombatFlags.isAttackDisabled(player)) {
+			return;
+		}
 
-				this.startUpswing(attributes);
-				info.setReturnValue(false);
-				info.cancel();
+		MinecraftClient client = this.thisClient();
+		WeaponAttributes attributes = WeaponRegistry.getAttributes(client.player.getMainHandStack());
+		if (attributes != null && attributes.attacks() != null) {
+			if (this.isTargetingMineableBlock() || this.isHarvesting) {
+				this.isHarvesting = true;
+				return;
 			}
 
+			this.startUpswing(attributes);
+			info.setReturnValue(false);
+			info.cancel();
 		}
 	}
 
@@ -136,30 +140,34 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 			cancellable = true
 	)
 	private void pre_handleBlockBreaking(boolean bl, CallbackInfo ci) {
-		if (BetterCombatClientMod.ENABLED) {
-			MinecraftClient client = this.thisClient();
-			WeaponAttributes attributes = WeaponRegistry.getAttributes(client.player.getMainHandStack());
-			if (attributes != null && attributes.attacks() != null) {
-				boolean isPressed = client.options.attackKey.isPressed();
-				if (isPressed && !this.isHoldingAttackInput) {
-					if (this.isTargetingMineableBlock() || this.isHarvesting) {
-						this.isHarvesting = true;
-						return;
-					}
+		if (!BetterCombatClientMod.ENABLED) {
+			return;
+		}
+		if (CombatFlags.isAttackDisabled(player)) {
+			return;
+		}
 
-					ci.cancel();
+		MinecraftClient client = this.thisClient();
+		WeaponAttributes attributes = WeaponRegistry.getAttributes(client.player.getMainHandStack());
+		if (attributes != null && attributes.attacks() != null) {
+			boolean isPressed = client.options.attackKey.isPressed();
+			if (isPressed && !this.isHoldingAttackInput) {
+				if (this.isTargetingMineableBlock() || this.isHarvesting) {
+					this.isHarvesting = true;
+					return;
 				}
 
-				if (BetterCombatClientMod.config.isHoldToAttackEnabled && !BetterCombatExtension.SERVER_CONFIG.disable_better_combat_hold_to_attack.get() && isPressed) {
-					this.isHoldingAttackInput = true;
-					this.startUpswing(attributes);
-					ci.cancel();
-				} else {
-					this.isHarvesting = false;
-					this.isHoldingAttackInput = false;
-				}
+				ci.cancel();
 			}
 
+			if (BetterCombatClientMod.config.isHoldToAttackEnabled && !BetterCombatExtension.SERVER_CONFIG.disable_better_combat_hold_to_attack.get() && isPressed) {
+				this.isHoldingAttackInput = true;
+				this.startUpswing(attributes);
+				ci.cancel();
+			} else {
+				this.isHarvesting = false;
+				this.isHoldingAttackInput = false;
+			}
 		}
 	}
 
@@ -169,7 +177,12 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 			cancellable = true
 	)
 	private void pre_doItemUse(CallbackInfo ci) {
-		if (BetterCombatClientMod.ENABLED) {
+		if (!BetterCombatClientMod.ENABLED) {
+			return;
+		}
+		if (CombatFlags.isAttackDisabled(player)) {
+			return;
+		}
 			AttackHand hand = this.getCurrentHand();
 			if (hand != null) {
 				double upswingRate = hand.upswingRate();
@@ -178,7 +191,6 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 				}
 
 			}
-		}
 	}
 
 	@Unique
@@ -304,7 +316,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 		((PlayerAttackAnimatable) this.player).playAttackAnimation(animationName, animatedHand, attackCooldownTicksFloat, upswingRate);
 
 		var particles = SlashParticleUtil.trailParticlesFromAttack(attackHand);
-		var appearance = SlashParticleUtil.appearanceFromItemStack(attackHand.itemStack());
+		var appearance = SlashParticleUtil.appearanceFor(this.player, attackHand.itemStack());
 		var packet = new Packets.AttackAnimation(
 				player.getId(), animatedHand, animationName, attackCooldownTicksFloat, upswingRate,
 				(float) PlayerAttackHelper.getStaticRange(player, attackHand.itemStack()),
@@ -484,7 +496,7 @@ public abstract class MinecraftClient_BetterCombatReplacementMixin implements Mi
 		});
 
 		var particles = SlashParticleUtil.trailParticlesFromAttack(hand);
-		var appearance = SlashParticleUtil.appearanceFromItemStack(hand.itemStack());
+		var appearance = SlashParticleUtil.appearanceFor(this.player, hand.itemStack());
 		SlashParticleUtil.spawnParticles(player, hand.isOffHand(), (float) PlayerAttackHelper.getStaticRange(player, hand.itemStack()), particles, appearance);
 
 		this.setComboCount(this.getComboCount() + 1);

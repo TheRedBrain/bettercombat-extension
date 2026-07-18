@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.11-SNAPSHOT'
+	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
 	id "com.matthewprenger.cursegradle" version "1.4.0"
 	id "com.github.breadmoirai.github-release" version "2.4.1"
 	id "com.modrinth.minotaur" version "2.+"
@@ -188,7 +188,7 @@ if(project.hasProperty('release_type')) {
 		versionNumber = "${version}" // You don't need to set this manually. Will fail if Modrinth has this version already
 		versionType = release_type // This is the default -- can also be `beta` or `alpha`
 		uploadFile = remapJar // With Loom, this MUST be set to `remapJar` instead of `jar`!
-		gameVersions = ["${project.minecraft_version}", "${project.minecraft_version_compat}"] // Must be an array, even with only one version
+		gameVersions = ["${project.minecraft_version}"] // Must be an array, even with only one version
 		loaders = ["fabric"] // Must also be an array - no need to specify this if you're using Loom or ForgeGradle
 		changelog = changelog_last_section()
 		dependencies { // A special DSL for creating dependencies

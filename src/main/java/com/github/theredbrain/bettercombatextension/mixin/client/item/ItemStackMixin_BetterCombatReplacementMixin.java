@@ -1,6 +1,7 @@
 package com.github.theredbrain.bettercombatextension.mixin.client.item;
 
 import com.github.theredbrain.bettercombatextension.BetterCombatExtension;
+import net.bettercombat.client.BetterCombatClientMod;
 import net.bettercombat.client.WeaponAttributeTooltip;
 import net.bettercombat.logic.EntityAttributeHelper;
 import net.bettercombat.logic.WeaponRegistry;
@@ -22,15 +23,15 @@ public class ItemStackMixin_BetterCombatReplacementMixin {
 	@Inject(method = "appendAttributeModifierTooltip", at = @At("HEAD"), cancellable = true)
 	private void appendAttributeModifierTooltip_BetterCombat_Range(Consumer<Text> textConsumer, PlayerEntity player,
 																   RegistryEntry<EntityAttribute> attribute, EntityAttributeModifier modifier, CallbackInfo ci) {
-		if (BetterCombatExtension.SERVER_CONFIG.enable_attack_range_attribute_integration.get()
+		if (BetterCombatClientMod.config.isTooltipAttackRangeReformat
 				&& attribute.value() == BetterCombatExtension.getAttackRangeAttribute().value()
 				&& player != null) { // Even vanilla code checks for this
 			var itemStack = (ItemStack) (Object) this;
 			if (WeaponRegistry.getAttributes(itemStack) != null                     // Only for weapons
 					&& EntityAttributeHelper.rangeModifierCount(itemStack) == 1) {  // Only if there is exactly one range modifier
+				ci.cancel();
 				var value = modifier.value() + player.getAttributeBaseValue(BetterCombatExtension.getAttackRangeAttribute());
 				textConsumer.accept(WeaponAttributeTooltip.attackRangeLine(value));
-				ci.cancel();
 			}
 		}
 	}
